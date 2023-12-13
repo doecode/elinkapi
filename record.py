@@ -130,12 +130,12 @@ class Record(BaseModel):
     languages: List[str] = ["English"]
     monographic_title: str = None
     opn_addressee: str = None
-    opn_declassified_date: datetime.datetime = None
+    opn_declassified_date: datetime.date = None
     opn_declassified_status: str = None
     opn_document_categories: List[str] = None
     opn_document_location: str = None
     opn_fieldoffice_acronym_code: str = None
-    other_information: str = None
+    other_information: list[str] = None
     ouo_release_date: datetime.date = None
     pams_publication_status: int = None
     pams_publication_status_other: str = None
