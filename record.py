@@ -174,7 +174,7 @@ class Record(BaseModel):
     subject_category_code: List[str] = None
     subject_category_code_legacy: List[str] = None
     title: str
-    description: str
+    description: str = None
     publication_date: datetime.date = None
     identifiers: List[Identifier] = None
     persons: List[Person] = None
