@@ -11,6 +11,7 @@ class Organization(BaseModel):
         CONTRIBUTING="CONTRIBUTING"
         RESEARCHING="RESEARCHING"
         SPONSOR="SPONSOR"
+        PAMS_TD_INST="PAMS_TD_INST"
 
     class Contribution(Enum):
         DataCollector="DataCollector"
