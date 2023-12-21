@@ -3,8 +3,8 @@ from urllib.parse import urlencode
 import sys
 import json
 from record import Record
-from error import Error
-from error_response import ErrorResponse
+from revisions import RevisionHistory, Revision
+from media_info import MediaInfo
 
 this = sys.modules[__name__]
 # this.url = 'https://review.osti.gov/elink2api/'
@@ -12,11 +12,11 @@ this.url = 'https://dev.osti.gov/elink2api/'
 this.api_token = ""
 
 # Define some helpfully-named Exceptions for API issues
-class APIException(IOError):
+class APIException(Exception):
     """ Error or Exception handling a particular request. """
 
     def __init__(self, *args):
-        super(IOError, self).__init__(*args)
+        super(Exception, self).__init__(*args)
 
 class NotFoundException(APIException):
     """ Record not on file. """
@@ -33,10 +33,27 @@ class UnauthorizedException(APIException):
 class BadRequestException(APIException):
     """ Unable to parse the JSON Request made. """
 
+def convert_error(error):
+    error_message = f"Status: {error['status']}\nDetail: {error['detail']}\nSource -> Pointer: {error['source']['pointer']}\n"
+    return error_message
+class ValidationException(APIException):
+    """Adds validation errors from the response to the exception message"""
+    def __init__(self, errors_dict):
+        self.errors_dict = errors_dict
+        super().__init__(self.generate_error_message(self.errors_dict))
+
+    def generate_error_message(self, errors_dict):
+        error_message = ""
+
+        for error in errors_dict:
+            error_message += convert_error(error) + "\n"
+
+        return error_message
+
 class ConflictException(APIException):
     """ The url or file already exists on the server. """
 
-
+# Internally used methods
 def _check_status_code(response):
     """Evaluates the response and selects the appropriate action based on 
     the status code 
@@ -45,12 +62,12 @@ def _check_status_code(response):
         response -- response from E-Link 2.0
 
     Raises:
-        BadRequestException: _description_
         UnauthorizedException: _description_
         ForbiddenException: _description_
         NotFoundException: _description_
         ConflictException: _description_
         ServerException: _description_
+        ValidationException: 
 
     Returns:
         Either the successful response or the appropriate exception is raised
@@ -58,7 +75,7 @@ def _check_status_code(response):
     if response.status_code in [200, 201, 204]:
         return response
     elif response.status_code == 400:
-        return ErrorResponse(**json.loads(response.text))
+        raise ValidationException((json.loads(response.text)["errors"]))
         # raise BadRequestException('Bad request, JSON cannot be interpreted, or validation issues.')
     elif response.status_code == 401:
         raise UnauthorizedException('No user account information supplied.')
@@ -71,6 +88,40 @@ def _check_status_code(response):
     else: # 500
         raise ServerException('ELINK service is not available or unknown connection error.')
 
+def _convert_response_to_records(response):
+    """Returns array of Records"""
+    json_records = json.loads(response.text)
+    
+    if(not isinstance(json_records, list)):
+        json_records = [json_records]
+    records = [Record(**record) for record in json_records]
+    
+    return records
+
+def _convert_response_to_media_info(response):
+    """returns array of media_info"""
+    return_val = []
+    all_media_info = json.loads(response.text)
+
+    for media in all_media_info:
+        return_val.append(MediaInfo(**media))
+
+    return return_val
+
+def _convert_response_to_revision_history(response):
+    """returns array of revision_history"""
+    return_val = []
+    all_history = json.loads(response.text)
+    
+    for revision in all_history:
+        return_val.append(Revision(**revision))
+
+    return RevisionHistory(**{"revision_history": return_val})
+
+
+# Start of actual module methods that should be used.
+
+# Setup and helper functions
 def set_api_token(api_token):
     """Sets the API Token that will be used in each call"""
     this.api_token = api_token
@@ -83,17 +134,7 @@ def set_target_url(url):
 def record_to_json(record):
     return record.model_dump_json()
 
-def convert_response_to_records(response):
-    """Returns array of Records"""
-    json_records = json.loads(response.text)
-    
-    if(not isinstance(json_records, list)):
-        json_records = [json_records]
-    records = [Record(**record) for record in json_records]
-    
-    return records
-
-
+# Record Methods
 def get_single_record(osti_id):
     """Obtain the metadata JSON for a record at OSTI
 
@@ -106,10 +147,9 @@ def get_single_record(osti_id):
     response = requests.get(this.url + "records/" + osti_id, headers={"Authorization": f"Bearer {this.api_token}"})
 
     return_value =_check_status_code(response)
+    
     if(type(return_value) is requests.Response):
-        return convert_response_to_records(response)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+        return _convert_response_to_records(response)
 
 def query_records(params):
     """Query for records using a variety of query params
@@ -129,11 +169,9 @@ def query_records(params):
     response = requests.get(f"{this.url}records{query_params}", headers={"Authorization": f"Bearer {this.api_token}"})
     
     return_value =_check_status_code(response)
+    
     if(type(return_value) is requests.Response):
-        return convert_response_to_records(response)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
-
+        return _convert_response_to_records(response)
 
 def reserve_doi(data):
     """ Save a Record with minimal validations: 
@@ -146,16 +184,14 @@ def reserve_doi(data):
         data -- Metadata record that you wish to make the new revision of OSTI ID
 
     Returns:
-        Minimal record with admin fields added
+        Record that has been saved to E-Link 2.0
     """
     response = requests.post(this.url + "records/save", headers={"Authorization": f"Bearer {this.api_token}"}, json=data)
 
     return_value =_check_status_code(response)
+    
     if(type(return_value) is requests.Response):
-        return convert_response_to_records(response)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
-    return _check_status_code(response)
+        return _convert_response_to_records(response)
 
 def submit_new_record(data):
     """Create a new metadata Record with OSTI
@@ -171,9 +207,7 @@ def submit_new_record(data):
     return_value =_check_status_code(response)
 
     if(type(return_value) is requests.Response):
-        return convert_response_to_records(response)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+        return _convert_response_to_records(response)
 
 def update_record(osti_id, data, state="save"):
     """Update existing records at OSTI by unique OSTI ID
@@ -193,9 +227,7 @@ def update_record(osti_id, data, state="save"):
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
-        return convert_response_to_records(response)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+        return _convert_response_to_records(response)
 
 def get_revision_by_number(osti_id, revision_number):
     """Access specific revision number of a given OSTI ID
@@ -208,17 +240,15 @@ def get_revision_by_number(osti_id, revision_number):
         The Record metadata at the given revision number
     """
     response = requests.get(f"{this.url}records/revision/{osti_id}/at/{revision_number}", headers={"Authorization": f"Bearer {this.api_token}"})
-
-    return_value =_check_status_code(response)
     
     # Special case on this exception -> Get 404's when date is before record creation
     if(response.status_code == 404): 
         raise NotFoundException("Requested record version is not on file.")
 
+    return_value =_check_status_code(response)
+
     if(type(return_value) is requests.Response):
-        return json.loads(response.text)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+        return _convert_response_to_records(response)
 
 def get_revision_by_date(osti_id, date):
     """Access revision of metadata by OSTI ID that was active at the given date-time provided
@@ -239,9 +269,8 @@ def get_revision_by_date(osti_id, date):
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
-        return json.loads(response.text)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+        # return json.loads(response.text)
+        return _convert_response_to_records(response)
 
 def get_all_revisions(osti_id):
     """Obtain summary information of all given revisions of a metadata record by its OSTI ID
@@ -257,11 +286,10 @@ def get_all_revisions(osti_id):
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
-        return json.loads(response.text)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+        return _convert_response_to_revision_history(response)
 
 
+# Media Methods
 def get_media(osti_id):
     """Get information about any media sets (files or URLs) associated with the OSTI ID
 
@@ -276,9 +304,7 @@ def get_media(osti_id):
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
-        return json.loads(response.text)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+        return _convert_response_to_media_info(response)
 
 def get_media_content(media_id):
     """Obtain content stream of a particular MEDIA FILE by its unique ID
@@ -295,8 +321,6 @@ def get_media_content(media_id):
     
     if(type(return_value) is requests.Response):
         return json.loads(response.text)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
 
 def post_media(osti_id, file_path, params=None):
     """Attach the media found at the given filepath to the record associated
@@ -312,7 +336,7 @@ def post_media(osti_id, file_path, params=None):
                   "url" that points to media if not sending file (default; {None})
         
     Returns:
-        True if successful, False/exception otherwise
+        A MediaInfo instance, an exception otherwise
     """
     query_params = ""
 
@@ -324,10 +348,7 @@ def post_media(osti_id, file_path, params=None):
     return_value =_check_status_code(response)
 
     if(type(return_value) is requests.Response):
-        return True
-    elif(type(return_value) is ErrorResponse):
-        return return_value
-    return False
+            return _convert_response_to_media_info(response)
 
 def put_media(osti_id, media_id, file_path, params=None):
     """Replace a given media set with a new basis; either a URL or a media file.
@@ -343,7 +364,7 @@ def put_media(osti_id, media_id, file_path, params=None):
                   "url" that points to media if not sending file (default; {None})
 
     Returns:
-        True if successful, False/exception otherwise
+        A MediaInfo instance, an exception otherwise
     """
     query_params = ""
 
@@ -357,9 +378,26 @@ def put_media(osti_id, media_id, file_path, params=None):
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
-        return json.loads(response.text)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+        return _convert_response_to_media_info(response)
+
+def delete_single_media(osti_id, media_id, reason):
+    """Disassociate an individual media set from this OSTI ID
+
+    Arguments:
+        osti_id -- ID that uniquely identifies an E-Link 2.0 Record
+        media_id -- ID that uniquely identifies a media file associated with an E-Link 2.0 Record
+        reason -- Reason for deleting all media
+
+    Returns:
+        True if successful, False/exception otherwise
+    """
+    response = requests.delete(f"{this.url}media/{osti_id}/{media_id}?reason={reason}", headers={"Authorization": f"Bearer {this.api_token}"})
+
+    return_value =_check_status_code(response)
+
+    if(response.status_code == 204): 
+        return True
+    return False
 
 def delete_all_media(osti_id, reason):
     """Disassociate ALL media sets from this OSTI ID 
@@ -375,27 +413,6 @@ def delete_all_media(osti_id, reason):
 
     return_value =_check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        return json.loads(response.text)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
-
-def delete_single_media(osti_id, media_id, reason):
-    """Disassociate an individual media set from this OSTI ID
-
-    Arguments:
-        osti_id -- ID that uniquely identifies an E-Link 2.0 Record
-        media_id -- ID that uniquely identifies a media file associated with an E-Link 2.0 Record
-        reason -- Reason for deleting all media
-
-    Returns:
-        True  if successful, False/exception otherwise
-    """
-    response = requests.delete(f"{this.url}media/{osti_id}/{media_id}?reason={reason}", headers={"Authorization": f"Bearer {this.api_token}"})
-
-    return_value =_check_status_code(response)
-    
-    if(type(return_value) is requests.Response):
-        return json.loads(response.text)
-    elif(type(return_value) is ErrorResponse):
-        return return_value
+    if(response.status_code == 204): 
+        return True
+    return False
