@@ -2,9 +2,9 @@ import requests
 from urllib.parse import urlencode
 import sys
 import json
-from record import Record
-from revisions import RevisionHistory, Revision
-from media_info import MediaInfo
+from models.record import Record
+from models.revisions import RevisionHistory, Revision
+from models.media_info import MediaInfo
 
 this = sys.modules[__name__]
 # this.url = 'https://review.osti.gov/elink2api/'
@@ -62,12 +62,12 @@ def _check_status_code(response):
         response -- response from E-Link 2.0
 
     Raises:
-        UnauthorizedException: _description_
-        ForbiddenException: _description_
-        NotFoundException: _description_
-        ConflictException: _description_
-        ServerException: _description_
-        ValidationException: 
+        UnauthorizedException: API token not provided with request
+        ForbiddenException: User is not allowed to access
+        NotFoundException: Requested object could not be found
+        ConflictException: Resource already exists
+        ValidationException: Issue with the submitted json, see error message for details
+        ServerException: Unknown error
 
     Returns:
         Either the successful response or the appropriate exception is raised
@@ -131,8 +131,12 @@ def set_target_url(url):
     Default= https://review.osti.gov/elink2api"""
     this.url = url
 
+def record_to_dict(record):
+    return record.model_dump(exclude_none=True)
+
+
 def record_to_json(record):
-    return record.model_dump_json()
+    return record.model_dump_json(exclude_none=True)
 
 # Record Methods
 def get_single_record(osti_id):
@@ -149,7 +153,8 @@ def get_single_record(osti_id):
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
-        return _convert_response_to_records(response)
+        # returns array, so grab the first element
+        return _convert_response_to_records(response)[0]
 
 def query_records(params):
     """Query for records using a variety of query params
@@ -173,7 +178,7 @@ def query_records(params):
     if(type(return_value) is requests.Response):
         return _convert_response_to_records(response)
 
-def reserve_doi(data):
+def reserve_doi(record):
     """ Save a Record with minimal validations: 
         Required:
             title
@@ -181,40 +186,41 @@ def reserve_doi(data):
             product_type
 
     Arguments:
-        data -- Metadata record that you wish to make the new revision of OSTI ID
+        record -- Metadata record that you wish to make the new revision of OSTI ID
 
     Returns:
         Record that has been saved to E-Link 2.0
     """
-    response = requests.post(this.url + "records/save", headers={"Authorization": f"Bearer {this.api_token}"}, json=data)
+    response = requests.post(this.url + "records/save", headers={"Authorization": f"Bearer {this.api_token}"}, json=json.loads(record.model_dump_json(exclude_none=True)))
 
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
         return _convert_response_to_records(response)
 
-def submit_new_record(data):
+def post_new_record(record, state="save"):
     """Create a new metadata Record with OSTI
 
     Arguments:
-        data -- Metadata record that you wish to make the new revision of OSTI ID
+        record -- Metadata record that you wish to make the new revision of OSTI ID
 
     Returns:
         Record with the admin fields added
     """
-    response = requests.post(f"{this.url}records/submit", headers={"Authorization": f"Bearer {this.api_token}"}, json=data)
+    response = requests.post(f"{this.url}records/{state}", headers={"Authorization": f"Bearer {this.api_token}", "Content-Type": "application/json"}, json=json.loads(record.model_dump_json(exclude_none=True)))
 
     return_value =_check_status_code(response)
 
     if(type(return_value) is requests.Response):
-        return _convert_response_to_records(response)
+        # returns array, so grab the first element
+        return _convert_response_to_records(response)[0] 
 
-def update_record(osti_id, data, state="save"):
+def update_record(osti_id, record, state="save"):
     """Update existing records at OSTI by unique OSTI ID
 
     Arguments:
         osti_id -- ID that uniquely identifies an E-link 2.0 Record
-        data -- Metadata record that you wish to make the new revision of OSTI ID
+        record -- Metadata record that you wish to make the new revision of OSTI ID
 
     Keyword Arguments:
         state -- The desired submission state of the record ("save" or "submit")  (default: {"save"})
@@ -222,12 +228,13 @@ def update_record(osti_id, data, state="save"):
     Returns:
         The updated Record with the given information in data, creating a new revision
     """
-    response = requests.put(f"{this.url}records/{osti_id}/{state}", headers={"Authorization": f"Bearer {this.api_token}"}, json=data)
+    response = requests.put(f"{this.url}records/{osti_id}/{state}", headers={"Authorization": f"Bearer {this.api_token}"}, json=record_to_dict(record))
 
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
-        return _convert_response_to_records(response)
+        # returns array, so grab the first element
+        return _convert_response_to_records(response)[0]
 
 def get_revision_by_number(osti_id, revision_number):
     """Access specific revision number of a given OSTI ID
@@ -248,7 +255,8 @@ def get_revision_by_number(osti_id, revision_number):
     return_value =_check_status_code(response)
 
     if(type(return_value) is requests.Response):
-        return _convert_response_to_records(response)
+        # returns array, so grab the first element
+        return _convert_response_to_records(response)[0]
 
 def get_revision_by_date(osti_id, date):
     """Access revision of metadata by OSTI ID that was active at the given date-time provided
@@ -269,8 +277,8 @@ def get_revision_by_date(osti_id, date):
     return_value =_check_status_code(response)
     
     if(type(return_value) is requests.Response):
-        # return json.loads(response.text)
-        return _convert_response_to_records(response)
+        # returns array, so grab the first element
+        return _convert_response_to_records(response)[0]
 
 def get_all_revisions(osti_id):
     """Obtain summary information of all given revisions of a metadata record by its OSTI ID

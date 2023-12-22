@@ -1,5 +1,4 @@
 from pydantic import BaseModel, ConfigDict, field_validator
-from error import Error
 from typing import List
 from enum import Enum
 import datetime

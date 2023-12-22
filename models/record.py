@@ -1,12 +1,13 @@
 from enum import Enum
-from identifier import Identifier
-from person import Person
-from related_identifier import RelatedIdentifier
-from organization import Organization
-from geolocation import Geolocation
+from models.identifier import Identifier
+from models.person import Person
+from models.related_identifier import RelatedIdentifier
+from models.organization import Organization
+from models.geolocation import Geolocation
 from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List
 import datetime
+import json
 
 class Record(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
@@ -225,3 +226,8 @@ class Record(BaseModel):
             self.geolocations.append(item)
         else:
             raise ValueError('Unable to determine type to add.')
+
+    # def pretty_print_record(self):
+    #     """Quick and dirty way to look at Record values - Does not show "None" value fields"""
+    #     print("Record:")
+    #     print(json.dumps(self.model_dump(exclude_none=True), indent=4, default=str))
