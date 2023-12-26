@@ -49,7 +49,9 @@ class ValidationException(APIException):
             error_message += convert_error(error) + "\n"
 
         return error_message
-
+    
+class ValidationException(APIException):
+    """Adds validation errors from the response to the exceptiton message"""
 class ConflictException(APIException):
     """ The url or file already exists on the server. """
 
@@ -120,23 +122,24 @@ def _convert_response_to_revision_history(response):
 
 
 # Start of actual module methods that should be used.
-
 # Setup and helper functions
 def set_api_token(api_token):
     """Sets the API Token that will be used in each call"""
     this.api_token = api_token
+    return this.api_token
 
-def set_target_url(url):
+def set_target_url(url="https://review.osti.gov/elink2api"):
     """Sets the target URL/environment you will be making requests to.
     Default= https://review.osti.gov/elink2api"""
     this.url = url
+    return this.url
 
 def record_to_dict(record):
     return record.model_dump(exclude_none=True)
 
-
 def record_to_json(record):
     return record.model_dump_json(exclude_none=True)
+
 
 # Record Methods
 def get_single_record(osti_id):
@@ -146,7 +149,7 @@ def get_single_record(osti_id):
         osti_id -- ID that uniquely identifies an E-link 2.0 Record
 
     Returns:
-        The metadata of a single record
+        Record - metadata of a single record 
     """
     response = requests.get(this.url + "records/" + osti_id, headers={"Authorization": f"Bearer {this.api_token}"})
 
@@ -164,7 +167,7 @@ def query_records(params):
             the list of allowed query parameters. 
 
     Returns:
-        An array of one or more matching metadata records, if found. 
+        List[Record] - A list of one or more matching metadata records, if found. 
     """
     query_params = ""
 
@@ -186,10 +189,10 @@ def reserve_doi(record):
             product_type
 
     Arguments:
-        record -- Metadata record that you wish to make the new revision of OSTI ID
+        record -- Metadata record that you wish to save to E-Link 2.0
 
     Returns:
-        Record that has been saved to E-Link 2.0
+        Record - metadata of a single record that has been saved to E-Link 2.0
     """
     response = requests.post(this.url + "records/save", headers={"Authorization": f"Bearer {this.api_token}"}, json=json.loads(record.model_dump_json(exclude_none=True)))
 
@@ -202,10 +205,13 @@ def post_new_record(record, state="save"):
     """Create a new metadata Record with OSTI
 
     Arguments:
-        record -- Metadata record that you wish to make the new revision of OSTI ID
+        record -- Metadata record that you wish to send ("save" or "submit") to E-Link 2.0
+
+    Keyword Arguments:
+        state -- The desired submission state of the record ("save" or "submit")  (default: {"save"})
 
     Returns:
-        Record with the admin fields added
+        Record - metadata of a single record saved (or submitted) to E-Link 2.0
     """
     response = requests.post(f"{this.url}records/{state}", headers={"Authorization": f"Bearer {this.api_token}", "Content-Type": "application/json"}, json=json.loads(record.model_dump_json(exclude_none=True)))
 
@@ -226,7 +232,7 @@ def update_record(osti_id, record, state="save"):
         state -- The desired submission state of the record ("save" or "submit")  (default: {"save"})
 
     Returns:
-        The updated Record with the given information in data, creating a new revision
+        Record - Metadata of record updated with the given information, creating a new revision
     """
     response = requests.put(f"{this.url}records/{osti_id}/{state}", headers={"Authorization": f"Bearer {this.api_token}"}, json=record_to_dict(record))
 
@@ -244,7 +250,7 @@ def get_revision_by_number(osti_id, revision_number):
         revision_number -- The specific revision number to retrieve
 
     Returns:
-        The Record metadata at the given revision number
+        Record - The metadata of the Record at the given revision number
     """
     response = requests.get(f"{this.url}records/revision/{osti_id}/at/{revision_number}", headers={"Authorization": f"Bearer {this.api_token}"})
     
@@ -266,7 +272,7 @@ def get_revision_by_date(osti_id, date):
         date -- Date on which you wish to search for a revision of a Record
 
     Returns:
-        The Record metadata on the given date
+        Record - The metadata of the Record on the given date
     """
     response = requests.get(f"{this.url}records/revision/{osti_id}/dated/{date}", headers={"Authorization": f"Bearer {this.api_token}"})
 
@@ -287,7 +293,7 @@ def get_all_revisions(osti_id):
         osti_id -- ID that uniquely identifies an E-link 2.0 Record
 
     Returns:
-        All the metadata of the revisions of a record: start/end dates, workflow status, and revision number
+        RevisionHistory - All the metadata of the revisions of a record
     """
     response = requests.get(f"{this.url}records/revision/{osti_id}", headers={"Authorization": f"Bearer {this.api_token}"})
 
@@ -305,7 +311,7 @@ def get_media(osti_id):
         osti_id -- ID that uniquely identifies an E-link 2.0 Record 
 
     Returns:
-        Metadata info of all the media associated with the osti_id
+        MediaInfo - info on all the media associated with the osti_id
     """
     response = requests.get(this.url + "media/" + osti_id, headers={"Authorization": f"Bearer {this.api_token}"})
 
@@ -344,7 +350,7 @@ def post_media(osti_id, file_path, params=None):
                   "url" that points to media if not sending file (default; {None})
         
     Returns:
-        A MediaInfo instance, an exception otherwise
+        MediaInfo 
     """
     query_params = ""
 
@@ -365,14 +371,14 @@ def put_media(osti_id, media_id, file_path, params=None):
     Arguments:
         osti_id -- ID that uniquely identifies an E-link 2.0 Record
         media_id -- ID that uniquely identifies a media file associated with an E-Link 2.0 Record
-        file_path -- Path to the media file that will be attached to the Record
+        file_path -- Path to the media file that will replace media_id Media
 
     Keyword Arguments:
         params -- "title" that can be associated with the media file
                   "url" that points to media if not sending file (default; {None})
 
     Returns:
-        A MediaInfo instance, an exception otherwise
+        MediaInfo
     """
     query_params = ""
 
