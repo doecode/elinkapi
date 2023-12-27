@@ -1,5 +1,32 @@
 # OSTIAPI - A Python Interface for E-Link 2.0
 
+# Table of Contents
+- [OSTIAPI - A Python Interface for E-Link 2.0](#ostiapi---a-python-interface-for-e-link-20)
+- [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+    - [Examples](#examples)
+      - [Creating a New Record](#creating-a-new-record)
+      - [Seeing Validation Errors on Exception](#seeing-validation-errors-on-exception)
+      - [View Revision History](#view-revision-history)
+      - [Adding Media to Record](#adding-media-to-record)
+      - [Removing Media from a Record](#removing-media-from-a-record)
+  - [Method Documentation](#method-documentation)
+    - [Configuration](#configuration)
+    - [Records](#records)
+      - [Revisions](#revisions)
+    - [Media](#media)
+  - [Classes](#classes)
+    - [Record](#record)
+    - [Organization](#organization)
+    - [Person](#person)
+    - [Identifier](#identifier)
+    - [Related Identifier](#related-identifier)
+    - [Geolocation](#geolocation)
+    - [Media Info](#media-info)
+    - [Media File](#media-file)
+    - [RevisionHistory](#revisionhistory)
+    - [Revision](#revision)
+
 ## Introduction
 This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation found [here](https://review.osti.gov/elink2api/)) and allows for you to quickly get up and running submitting Records using Python. 
 
@@ -12,6 +39,7 @@ from models.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 
+# Record with minimal fields to save
 my_record_json = {
         "title": "A Dissertation Title",
         "site_ownership_code": "AAAA",
@@ -34,6 +62,8 @@ from models.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 
+# Record missing fields, will give 2 validation errors, one for 
+# each missing field: title and product_type
 my_invalid_record_json = {
         "site_ownership_code": "AAAA"
         }
@@ -60,6 +90,9 @@ try:
     revision_history = ostiapi.get_all_revisions(osti_id)
 except Exception as e:
     // Handle the exception as needed
+
+most_recent_revision = revision_history[0]
+oldest_revision = revision_history[-1]
 ```
 
 #### Adding Media to Record
@@ -79,7 +112,7 @@ except Exception as e:
     // Handle the exception as needed
 ```
 
-#### Removing Media From a Record
+#### Removing Media from a Record
 ```python
 import ostiapi
 from models.record import Record
@@ -102,14 +135,14 @@ except Exception as e:
 
 ### Configuration
 Method: 
-> set_api_token(api_token)
+> set_api_token(*api_token*)
 
 Returns: The API token that has been set
 Params: 
 - *api_token* - **str**: Unique to user API token that can be generated from your E-Link 2.0 Account page
 
 Method: 
-> set_target_url(url="https://review.osti.gov/elink2api"): 
+> set_target_url(*url*="https://review.osti.gov/elink2api"):
 
 Returns: The url that has been set
 Params: 
@@ -132,7 +165,7 @@ Params:
     the list of allowed query parameters.
 
 Method:
->  reserve_doi(record)
+>  reserve_doi(*record*)
 
 Returns: Record
 Params: 
@@ -147,7 +180,7 @@ Params:
 - *state* - **str**: The desired submission *state* of the record ("save" or "submit")  (default: {"save"})
 
 Method:
->  update_record(*osti_id*, record, *state*="save")
+>  update_record(*osti_id*, *record*, *state*="save")
 
 Returns: Record
 Params:
@@ -157,7 +190,7 @@ Params:
 
 #### Revisions
 Method:
->  get_revision_by_number(*osti_id*, revision_number)
+>  get_revision_by_number(*osti_id*, *revision_number*)
 
 Returns: Record
 Params:
@@ -165,7 +198,7 @@ Params:
 - *revision_number* - **int**: The specific revision number to retrieve (original record is 1 and each revision increments upward by 1)
 
 Method:
->  get_revision_by_date(*osti_id*, date)
+>  get_revision_by_date(*osti_id*, *date*)
 
 Returns: Record
 Params:
@@ -188,11 +221,11 @@ Params:
 - *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
 
 Method:
->  get_media_content(*media_id*)
+>  get_media_content(*media_file_id*)
 
-Returns: text/exception
+Returns: Byte string of the media file content
 Params:
-- *media_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
+- *media_file_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 
 Method:
 >  post_media(*osti_id*, *file_path*, *params*=None)
@@ -263,7 +296,6 @@ Point: {
     "latitude": float
     "longitude": float
 }
-
 ```
 <u>**Example**</u>
 ```python
