@@ -1,8 +1,8 @@
 # OSTIAPI - A Python Interface for E-Link 2.0
 
-# Table of Contents
+## Table of Contents
 - [OSTIAPI - A Python Interface for E-Link 2.0](#ostiapi---a-python-interface-for-e-link-20)
-- [Table of Contents](#table-of-contents)
+  - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
     - [Examples](#examples)
       - [Creating a New Record](#creating-a-new-record)
@@ -24,7 +24,6 @@
     - [Geolocation](#geolocation)
     - [Media Info](#media-info)
     - [Media File](#media-file)
-    - [RevisionHistory](#revisionhistory)
     - [Revision](#revision)
 
 ## Introduction
@@ -285,7 +284,7 @@ Matches the [Identifiers model](https://review.osti.gov/elink2api/#tag/identifie
 Matches the [Related Identifiers model](https://review.osti.gov/elink2api/#tag/related_identifier_model) described in E-Link 2.0's API documentation
 
 ### Geolocation
-<u>**Schema**</u>
+<u>Schema</u>
 ```python
 Geolocation: {
     "type": str
@@ -297,7 +296,7 @@ Point: {
     "longitude": float
 }
 ```
-<u>**Example**</u>
+<u>Example</u>
 ```python
 {
     "type": "BOX",
@@ -314,8 +313,9 @@ Point: {
     ]
 }
 ```
+
 ### Media Info
-<u>**Schema**</u>
+<u>Schema</u>
 ```python
 [
     {
@@ -338,8 +338,7 @@ Point: {
     }
 ]
 ```
-
-<u>**Example**</u>
+<u>Example</u>
 ```python
 [
     {
@@ -361,9 +360,11 @@ Point: {
         "files": []
     }
 ]
+
 ```
+
 ### Media File
-<u>**Schema**</u>
+<u>Schema</u>
 ```python
 {
     "media_file_id": int,
@@ -393,31 +394,7 @@ Point: {
     "date_file_updated": "2023-12-20T22:13:16.668+00:00"
 }
 ```
-### RevisionHistory
-<u>**Schema**</u>
-```python
-{
-    "revision_history": List[Revision]
-}
-```
-<u>**Example**</u>
-```python
-[
-    {
-        "date_valid_start": "2023-12-04T13:22:45.092+00:00",
-        "osti_id": 2302081,
-        "revision": 2,
-        "workflow_status": "R"
-    },
-    {
-        "date_valid_start": "2023-11-30T15:02:14.264+00:00",
-        "date_valid_end": "2023-12-04T13:22:45.092+00:00",
-        "osti_id": 2302081,
-        "revision": 1,
-        "workflow_status": "R"
-    }
-]
-```
+
 ### Revision
 <u>**Schema**</u>
 ```python

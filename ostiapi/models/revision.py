@@ -27,8 +27,3 @@ class Revision(BaseModel):
         if value not in [type.value for type in cls.WorkflowStatus]:
             raise ValueError("Unknown Workflow Status {}.".format(value))
         return value
-
-class RevisionHistory(BaseModel):
-    model_config = ConfigDict(validate_assignment=True)
-
-    revision_history: List[Revision]

@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 import sys
 import json
 from models.record import Record
-from models.revisions import RevisionHistory, Revision
+from models.revision import Revision
 from models.media_info import MediaInfo
 
 this = sys.modules[__name__]
@@ -115,6 +115,12 @@ def _convert_response_to_revision_history(response):
     return_val = []
     all_history = json.loads(response.text)
     
+    if(not isinstance(all_history, list)):
+        all_history = [all_history]
+    revisions = [Revision(**revision) for revision in all_history]
+    
+    return revisions
+
     for revision in all_history:
         return_val.append(Revision(**revision))
 
@@ -153,11 +159,10 @@ def get_single_record(osti_id):
     """
     response = requests.get(this.url + "records/" + osti_id, headers={"Authorization": f"Bearer {this.api_token}"})
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        # returns array, so grab the first element
-        return _convert_response_to_records(response)[0]
+    # returns array, so grab the first element
+    return _convert_response_to_records(response)[0]
 
 def query_records(params):
     """Query for records using a variety of query params
@@ -176,10 +181,9 @@ def query_records(params):
 
     response = requests.get(f"{this.url}records{query_params}", headers={"Authorization": f"Bearer {this.api_token}"})
     
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        return _convert_response_to_records(response)
+    return _convert_response_to_records(response)
 
 def reserve_doi(record):
     """ Save a Record with minimal validations: 
@@ -196,10 +200,9 @@ def reserve_doi(record):
     """
     response = requests.post(this.url + "records/save", headers={"Authorization": f"Bearer {this.api_token}"}, json=json.loads(record.model_dump_json(exclude_none=True)))
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        return _convert_response_to_records(response)
+    return _convert_response_to_records(response)
 
 def post_new_record(record, state="save"):
     """Create a new metadata Record with OSTI
@@ -215,11 +218,10 @@ def post_new_record(record, state="save"):
     """
     response = requests.post(f"{this.url}records/{state}", headers={"Authorization": f"Bearer {this.api_token}", "Content-Type": "application/json"}, json=json.loads(record.model_dump_json(exclude_none=True)))
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
 
-    if(type(return_value) is requests.Response):
-        # returns array, so grab the first element
-        return _convert_response_to_records(response)[0] 
+    # returns array, so grab the first element
+    return _convert_response_to_records(response)[0] 
 
 def update_record(osti_id, record, state="save"):
     """Update existing records at OSTI by unique OSTI ID
@@ -236,11 +238,10 @@ def update_record(osti_id, record, state="save"):
     """
     response = requests.put(f"{this.url}records/{osti_id}/{state}", headers={"Authorization": f"Bearer {this.api_token}"}, json=record_to_dict(record))
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        # returns array, so grab the first element
-        return _convert_response_to_records(response)[0]
+    # returns array, so grab the first element
+    return _convert_response_to_records(response)[0]
 
 def get_revision_by_number(osti_id, revision_number):
     """Access specific revision number of a given OSTI ID
@@ -258,11 +259,10 @@ def get_revision_by_number(osti_id, revision_number):
     if(response.status_code == 404): 
         raise NotFoundException("Requested record version is not on file.")
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
 
-    if(type(return_value) is requests.Response):
-        # returns array, so grab the first element
-        return _convert_response_to_records(response)[0]
+    # returns array, so grab the first element
+    return _convert_response_to_records(response)[0]
 
 def get_revision_by_date(osti_id, date):
     """Access revision of metadata by OSTI ID that was active at the given date-time provided
@@ -280,11 +280,10 @@ def get_revision_by_date(osti_id, date):
     if(response.status_code == 404): 
         raise NotFoundException("Record version for specified date is not on file.")
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        # returns array, so grab the first element
-        return _convert_response_to_records(response)[0]
+    # returns array, so grab the first element
+    return _convert_response_to_records(response)[0]
 
 def get_all_revisions(osti_id):
     """Obtain summary information of all given revisions of a metadata record by its OSTI ID
@@ -297,10 +296,9 @@ def get_all_revisions(osti_id):
     """
     response = requests.get(f"{this.url}records/revision/{osti_id}", headers={"Authorization": f"Bearer {this.api_token}"})
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        return _convert_response_to_revision_history(response)
+    return _convert_response_to_revision_history(response)
 
 
 # Media Methods
@@ -311,30 +309,28 @@ def get_media(osti_id):
         osti_id -- ID that uniquely identifies an E-link 2.0 Record 
 
     Returns:
-        MediaInfo - info on all the media associated with the osti_id
+        List[MediaInfo] - info on all the media associated with the osti_id
     """
     response = requests.get(this.url + "media/" + osti_id, headers={"Authorization": f"Bearer {this.api_token}"})
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        return _convert_response_to_media_info(response)
+    return _convert_response_to_media_info(response)
 
-def get_media_content(media_id):
+def get_media_content(media_file_id):
     """Obtain content stream of a particular MEDIA FILE by its unique ID
 
     Arguments:
         media_id -- ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 
     Returns:
-        Text that is associated with the media_id
+        Binary string that is the content associated with the media_file_id
     """
-    response = requests.get(f"{this.url}media/{media_id}", headers={"Authorization": f"Bearer {this.api_token}"})
+    response = requests.get(f"{this.url}media/file/{media_file_id}", headers={"Authorization": f"Bearer {this.api_token}"})
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        return json.loads(response.text)
+    return response.content
 
 def post_media(osti_id, file_path, params=None):
     """Attach the media found at the given filepath to the record associated
@@ -359,10 +355,9 @@ def post_media(osti_id, file_path, params=None):
 
     response = requests.post(f"{this.url}media/{osti_id}{query_params}", headers={"Authorization": f"Bearer {this.api_token}"}, files={'file': file_path})
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
 
-    if(type(return_value) is requests.Response):
-            return _convert_response_to_media_info(response)
+    return _convert_response_to_media_info(response)
 
 def put_media(osti_id, media_id, file_path, params=None):
     """Replace a given media set with a new basis; either a URL or a media file.
@@ -389,10 +384,9 @@ def put_media(osti_id, media_id, file_path, params=None):
                             headers={"Authorization": f"Bearer {this.api_token}"}, 
                             files={'file': open(file_path, 'rb')})
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
-    if(type(return_value) is requests.Response):
-        return _convert_response_to_media_info(response)
+    return _convert_response_to_media_info(response)
 
 def delete_single_media(osti_id, media_id, reason):
     """Disassociate an individual media set from this OSTI ID
@@ -407,7 +401,7 @@ def delete_single_media(osti_id, media_id, reason):
     """
     response = requests.delete(f"{this.url}media/{osti_id}/{media_id}?reason={reason}", headers={"Authorization": f"Bearer {this.api_token}"})
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
 
     if(response.status_code == 204): 
         return True
@@ -425,7 +419,7 @@ def delete_all_media(osti_id, reason):
     """
     response = requests.delete(f"{this.url}media/{osti_id}?reason={reason}", headers={"Authorization": f"Bearer {this.api_token}"})
 
-    return_value =_check_status_code(response)
+    _check_status_code(response)
     
     if(response.status_code == 204): 
         return True
