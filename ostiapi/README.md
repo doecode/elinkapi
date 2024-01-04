@@ -10,6 +10,7 @@
       - [View Revision History](#view-revision-history)
       - [Adding Media to Record](#adding-media-to-record)
       - [Removing Media from a Record](#removing-media-from-a-record)
+      - [Compare Two Revision Histories](#compare-two-revision-histories)
   - [Method Documentation](#method-documentation)
     - [Configuration](#configuration)
     - [Records](#records)
@@ -37,7 +38,8 @@ This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation fo
 import ostiapi
 from ostiapi import Record
 
-ostiapi = OstiApi("___Your-API-Token___", url="https:review.osti.gov/elink2api/")
+ostiapi.set_api_token("___Your-API-Token___")
+ostiapi.set_target_url('https://dev.osti.gov/elink2api/')
 
 # Record with minimal fields to save
 my_record_json = {
@@ -58,28 +60,43 @@ except Exception as e:
 #### Seeing Validation Errors on Exception
 ```python
 import ostiapi
-from models.record import Record
+from ostiapi import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
+ostiapi.set_target_url('https://review.osti.gov/elink2api/')
 
 # Record missing fields, will give 2 validation errors, one for 
 # each missing field: title and product_type
 my_invalid_record_json = {
-        "site_ownership_code": "AAAA"
-        }
+    "site_ownership_code": "AAAA"
+}
+
+try:
+    # The pydantic model will raise exceptions for the 2 missing 
+    # fields - title and product_type
+    my_record = Record(**my_invalid_record_json)
+except Exception as e:
+    print('Exception on Record creation')
+
+my_invalid_record_json = {
+    "title": "A Sample Title",
+    "product_type": "TD",
+    "site_ownership_code": "AAAA"
+}
 
 saved_record = None
 try:
-    saved_record = ostiapi.post_new_record(Record(**my_invalid_record_json), "save")
+    # The API will now return an error code on this call
+    # because "AAAA" is not a valid site_ownership_code
+    saved_record = ostiapi.post_new_record(my_record, "save")
 except Exception as e:
     # Handle the exception as needed
-    print(e)
+
 ```
 
 #### View Revision History
 ```python
 import ostiapi
-from ostiapi import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -98,7 +115,6 @@ oldest_revision = revision_history[-1]
 #### Adding Media to Record
 ```python
 import ostiapi
-from models.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -115,7 +131,6 @@ except Exception as e:
 #### Removing Media from a Record
 ```python
 import ostiapi
-from models.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -127,7 +142,24 @@ response = None
 try:
     response = ostiapi.delete_single_media(osti_id, media_id, reason)
 except Exception as e:
-    // Handle the exception as needed
+    # Handle the exception as needed
+```
+
+#### Compare Two Revision Histories
+```python
+import ostiapi
+
+ostiapi.set_api_token("___Your-API-Token___")
+
+osti_id = 2300069
+revision_id_left = 1
+revision_id_right = 2
+
+response = None
+try:
+    response = ostiapi.compare_two_revisions(osti_id, revision_id_left, revision_id_right)
+except Exception as e:
+    # // Handle the exception as needed
 ```
 
 
