@@ -1,0 +1,27 @@
+[build-system]
+requires = ['setuptools']
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ostiapi"
+version = "0.1.11" 
+authors = [
+  { name="Jacob Samar", email="samarj@osti.gov" },
+]
+description = "OSTI API package"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests", 
+    "pydantic", 
+    "urllib3==1.26.6"
+]
+
+[project.urls]
+Homepage = "https://github.com/pypa/sampleproject"
+Issues = "https://github.com/pypa/sampleproject/issues"

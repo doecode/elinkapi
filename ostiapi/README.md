@@ -25,6 +25,7 @@
     - [Media Info](#media-info)
     - [Media File](#media-file)
     - [Revision](#revision)
+    - [Revision Comparison](#revision-comparison)
 
 ## Introduction
 This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation found [here](https://review.osti.gov/elink2api/)) and allows for you to quickly get up and running submitting Records using Python. 
@@ -34,9 +35,9 @@ This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation fo
 #### Creating a New Record
 ```python
 import ostiapi
-from models.record import Record
+from ostiapi import Record
 
-ostiapi.set_api_token("___Your-API-Token___")
+ostiapi = OstiApi("___Your-API-Token___", url="https:review.osti.gov/elink2api/")
 
 # Record with minimal fields to save
 my_record_json = {
@@ -78,7 +79,7 @@ except Exception as e:
 #### View Revision History
 ```python
 import ostiapi
-from models.record import Record
+from ostiapi import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -405,6 +406,30 @@ Point: {
     "revision": int,
     "workflow_status": str
 }
+```
+<u>**Example**</u>
+```python
+{
+    "date_valid_start": "2022-12-04T13:22:45.092+00:00",
+    "date_valid_end": "2023-12-04T13:22:45.092+00:00",
+    "osti_id": 2302081,
+    "revision": 2,
+    "workflow_status": "R"
+}
+```
+
+### Revision Comparison
+<u>**Schema**</u>
+```python
+[
+    {
+        "date_valid_start": datetime,
+        "date_valid_end": datetime,
+        "osti_id": int,
+        "revision": int,
+        "workflow_status": str
+    }
+]
 ```
 <u>**Example**</u>
 ```python
