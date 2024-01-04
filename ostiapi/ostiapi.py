@@ -4,6 +4,7 @@ import sys
 import json
 from models.record import Record
 from models.revision import Revision
+from models.revision_comparison import RevisionComparison
 from models.media_info import MediaInfo
 
 this = sys.modules[__name__]
@@ -114,7 +115,6 @@ def _convert_response_to_media_info(response):
 
 def _convert_response_to_revision_history(response):
     """returns array of revision_history"""
-    return_val = []
     all_history = json.loads(response.text)
     
     if(not isinstance(all_history, list)):
@@ -125,14 +125,11 @@ def _convert_response_to_revision_history(response):
 
 def _convert_response_to_revision_comparison(response):
     """returns array of revision_history"""
-    return_val = []
-    all_history = json.loads(response.text)
+    comparison = json.loads(response.text)
     
-    if(not isinstance(all_history, list)):
-        all_history = [all_history]
-    revisions = [Revision(**revision) for revision in all_history]
+    revisions_comparison = RevisionComparison(**comparison) 
     
-    return revisions
+    return revisions_comparison
 
 
 # Start of actual module methods that should be used.
