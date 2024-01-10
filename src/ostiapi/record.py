@@ -1,13 +1,12 @@
 from enum import Enum
-from models.identifier import Identifier
-from models.person import Person
-from models.related_identifier import RelatedIdentifier
-from models.organization import Organization
-from models.geolocation import Geolocation
+from .identifier import Identifier
+from .person import Person
+from .related_identifier import RelatedIdentifier
+from .organization import Organization
+from .geolocation import Geolocation
 from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List
 import datetime
-import json
 
 class Record(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
