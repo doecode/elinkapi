@@ -2,10 +2,10 @@ import requests
 from urllib.parse import urlencode
 import sys
 import json
-from models.record import Record
-from models.revision import Revision
-from models.revision_comparison import RevisionComparison
-from models.media_info import MediaInfo
+from .record import Record
+from .revision import Revision
+from .revision_comparison import RevisionComparison
+from .media_info import MediaInfo
 
 this = sys.modules[__name__]
 # this.url = 'https://review.osti.gov/elink2api/'
@@ -127,9 +127,9 @@ def _convert_response_to_revision_comparison(response):
     """returns array of revision_history"""
     comparison = json.loads(response.text)
     
-    revisions_comparison = RevisionComparison(**comparison) 
+    revision_comparison = [RevisionComparison(**field_diff) for field_diff in comparison]
     
-    return revisions_comparison
+    return revision_comparison
 
 
 # Start of actual module methods that should be used.
@@ -314,7 +314,7 @@ def compare_two_revisions(osti_id, left, right):
         right -- The second revision number to retrieve and compare
 
     Returns:
-        RevisionComparison
+        List[RevisionComparison]
     """
     response = requests.get(f"{this.url}records/revision/{osti_id}/compare/{left}/{right}", headers={"Authorization": f"Bearer {this.api_token}"})
 

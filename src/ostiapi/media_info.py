@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from typing import List
 import datetime
-from models.media_file import MediaFile
+from .media_file import MediaFile
 
 class MediaInfo(BaseModel):
     model_config = ConfigDict(validate_assignment=True)

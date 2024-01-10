@@ -35,8 +35,8 @@ This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation fo
 
 #### Creating a New Record
 ```python
-import ostiapi
-from ostiapi import Record
+from ostiapi import ostiapi
+from ostiapi.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 ostiapi.set_target_url('https://dev.osti.gov/elink2api/')
@@ -59,8 +59,8 @@ except Exception as e:
 
 #### Seeing Validation Errors on Exception
 ```python
-import ostiapi
-from ostiapi import Record
+from ostiapi import ostiapi
+from ostiapi.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 ostiapi.set_target_url('https://review.osti.gov/elink2api/')
@@ -96,7 +96,7 @@ except Exception as e:
 
 #### View Revision History
 ```python
-import ostiapi
+from ostiapi import ostiapi
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -114,7 +114,7 @@ oldest_revision = revision_history[-1]
 
 #### Adding Media to Record
 ```python
-import ostiapi
+from ostiapi import ostiapi
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -130,7 +130,7 @@ except Exception as e:
 
 #### Removing Media from a Record
 ```python
-import ostiapi
+from ostiapi import ostiapi
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -147,7 +147,7 @@ except Exception as e:
 
 #### Compare Two Revision Histories
 ```python
-import ostiapi
+from ostiapi import ostiapi
 
 ostiapi.set_api_token("___Your-API-Token___")
 
