@@ -1,13 +1,7 @@
 # OSTIAPI - A Python Interface for E-Link 2.0
 
-## Open Questions
-- Still need a license designation
-- Do we want organizational credentials for Pypi test and/or Prod?
-- see about enum for query to elink -- enum doesn't really make a ton of sense. Maybe prepopulated empty dict, would have to look and remove all empty values before urlencode. 
-
 ## Table of Contents
 - [OSTIAPI - A Python Interface for E-Link 2.0](#ostiapi---a-python-interface-for-e-link-20)
-  - [Open Questions](#open-questions)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
     - [Examples](#examples)
@@ -194,8 +188,8 @@ Method:
 Returns: Record
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
-
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+---
 Method:
 >  query_records(*params*)
 
@@ -204,7 +198,7 @@ Returns: List[Records]
 Params:
 - *params* - **dict**: See [here](https://review.osti.gov/elink2api/#tag/records/operation/getRecords) for 
     the list of allowed query parameters.
-
+---
 Method:
 >  reserve_doi(*record*)
 
@@ -212,7 +206,7 @@ Returns: Record
 
 Params: 
 - *record* - **Record**: Metadata record that you wish to save to E-Link 2.0
-
+---
 Method:
 >  post_new_record(record, *state*="save")
 
@@ -221,17 +215,17 @@ Returns: Record
 Params:
 - *record* - **Record**: Metadata record that you wish to send ("save" or "submit") to E-Link 2.0
 - *state* - **str**: The desired submission *state* of the record ("save" or "submit")  (default: {"save"})
-
+---
 Method:
 >  update_record(*osti_id*, *record*, *state*="save")
 
 Returns: Record
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *record* - **Record**: Metadata record that you wish to make the new revision of OSTI ID
 - *state* - **str**: The desired submission *state* of the record ("save" or "submit")  (default: {"save"})
-
+---
 #### Revisions
 Method:
 >  get_revision_by_number(*osti_id*, *revision_number*)
@@ -239,26 +233,36 @@ Method:
 Returns: Record
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *revision_number* - **int**: The specific revision number to retrieve (original record is 1 and each revision increments upward by 1)
-
+---
 Method:
 >  get_revision_by_date(*osti_id*, *date*)
 
 Returns: Record
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *date* - **datetime**: Date on which you wish to search for a revision of a Record
-
+---
 Method:
 >  get_all_revisions(*osti_id*)
 
 Returns: RevisionHistory
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+---
+Method:
+> compare_two_revisions(osti_id, left, right)
 
+Returns: List[RevisionComparison]
+
+Params: 
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+- *left* - **int**: The first revision number to retrieve and compare to the right
+- *right* - **int** The second revision number to retrieve and compare to the left
+---
 ### Media
 Method:
 >  get_media(*osti_id*)
@@ -266,8 +270,8 @@ Method:
 Returns: MediaInfo
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
-
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+---
 Method:
 >  get_media_content(*media_file_id*)
 
@@ -275,49 +279,49 @@ Returns: Byte string of the media file content
 
 Params:
 - *media_file_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
-
+---
 Method:
 >  post_media(*osti_id*, *file_path*, *params*=None)
 
 Returns: MediaInfo
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *file_path* - **str**: Path to the media file that will be attached to the Record 
 - *params* - **dict**: "title" that can be associated with the media file
         "url" that points to media if not sending file (default; {None})
-
+---
 Method:
 >  put_media(*osti_id*, *media_id*, *file_path*, *params*=None)
 
 Returns: MediaInfo
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *media_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 - *file_path* - **str**: Path to the media file that will replace *media_id* Media
 - *params* - **dict**: "title" that can be associated with the media file
         "url" that points to media if not sending file (default; {None}) 
-
+---
 Method:
 >  delete_all_media(*osti_id*, *reason*)
 
 Returns: True on success, False on failure
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *reason* - **str**: *reason* for deleting all media 
-
+---
 Method:
 >  delete_single_media(*osti_id*, *media_id*, *reason*)
 
 Returns: True on success, False on failure
 
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *media_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 - *reason* - **str**: reason for deleting media
-
+---
 ## Classes
 Each class is a pydantic model that validates the metadata's data types and 
 enumerated values on instantiation of the class.
