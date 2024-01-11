@@ -1,7 +1,13 @@
 # OSTIAPI - A Python Interface for E-Link 2.0
 
+## Open Questions
+- Still need a license designation
+- Do we want organizational credentials for Pypi test and/or Prod?
+- see about enum for query to elink -- enum doesn't really make a ton of sense. Maybe prepopulated empty dict, would have to look and remove all empty values before urlencode. 
+
 ## Table of Contents
 - [OSTIAPI - A Python Interface for E-Link 2.0](#ostiapi---a-python-interface-for-e-link-20)
+  - [Open Questions](#open-questions)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
     - [Examples](#examples)
@@ -172,7 +178,7 @@ Returns: The API token that has been set
 
 Params: 
 - *api_token* - **str**: Unique to user API token that can be generated from your E-Link 2.0 Account page
-
+---
 Method: 
 > set_target_url(*url*="https://review.osti.gov/elink2api"):
 
@@ -180,7 +186,7 @@ Returns: The url that has been set
 
 Params: 
 - *url* - **str**: The url to which all other module methods will direct their requests (default: {"https://review.osti.gov/elink2api"})
-
+---
 ### Records
 Method:
 >  get_single_record(*osti_id*)
