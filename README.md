@@ -91,7 +91,6 @@ try:
     saved_record = ostiapi.post_new_record(my_record, "save")
 except Exception as e:
     # Handle the exception as needed
-
 ```
 
 #### View Revision History
@@ -465,11 +464,16 @@ Point: {
 ```
 <u>**Example**</u>
 ```python
-{
-    "date_valid_start": "2022-12-04T13:22:45.092+00:00",
-    "date_valid_end": "2023-12-04T13:22:45.092+00:00",
-    "osti_id": 2302081,
-    "revision": 2,
-    "workflow_status": "R"
-}
-```
+[
+    {
+        "pointer": "/edit_reason",
+        "left": "API record creation",
+        "right": "API metadata Update"
+    },
+    {
+        "pointer": "/description",
+        "left": "A custom description. Search on 'Allo-ballo holla olah'.",
+        "right": "A NEW custom description. Search on 'Allo-ballo holla olah'."
+    }
+]
+'```
