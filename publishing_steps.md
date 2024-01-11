@@ -1,3 +1,18 @@
+# Development Guide
+
+Publishing to either test or production PyPI requires an account setup in the appropriate environment. For test, register [here](https://test.pypi.org/account/register/). For prod, register [here](https://pypi.org/account/register/). For ease-of-use, you can create a file, `$HOME/.pypirc`, that will automatically apply the credentials when publishing. You just need to generate an API token on the appropriate PyPI domain and format your `.pypirc` file as follows:
+
+```
+[pypi]
+username = __token__
+password = <the token value, including the 'pypi-' prefix>
+
+[testpypi]
+username = __token__
+password = <the token value, including the 'pypi-' prefix>
+
+```
+
 ## Development Instructions Test
 
 ### Publishing Package to test.pypi.org
