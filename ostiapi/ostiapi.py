@@ -169,7 +169,7 @@ def get_single_record(osti_id):
     # returns array, so grab the first element
     return _convert_response_to_records(response)[0]
 
-def query_records(params):
+def query_records(**kwargs):
     """Query for records using a variety of query params
 
     Arguments:
@@ -181,8 +181,8 @@ def query_records(params):
     """
     query_params = ""
 
-    if(len(params) > 0):
-        query_params = "?" + urlencode(params)
+    if(len(kwargs) > 0):
+        query_params = "?" + urlencode(kwargs)
 
     response = requests.get(f"{this.url}records{query_params}", headers={"Authorization": f"Bearer {this.api_token}"})
     
