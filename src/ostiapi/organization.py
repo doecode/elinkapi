@@ -1,5 +1,5 @@
 from enum import Enum
-from models.identifier import Identifier
+from .identifier import Identifier
 from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List
 

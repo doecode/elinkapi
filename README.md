@@ -1,7 +1,13 @@
 # OSTIAPI - A Python Interface for E-Link 2.0
 
+## Open Questions
+- Still need a license designation
+- Do we want organizational credentials for Pypi test and/or Prod?
+- see about enum for query to elink -- enum doesn't really make a ton of sense. Maybe prepopulated empty dict, would have to look and remove all empty values before urlencode. 
+
 ## Table of Contents
 - [OSTIAPI - A Python Interface for E-Link 2.0](#ostiapi---a-python-interface-for-e-link-20)
+  - [Open Questions](#open-questions)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
     - [Examples](#examples)
@@ -35,8 +41,8 @@ This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation fo
 
 #### Creating a New Record
 ```python
-import ostiapi
-from ostiapi import Record
+from ostiapi import ostiapi
+from ostiapi.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 ostiapi.set_target_url('https://dev.osti.gov/elink2api/')
@@ -59,8 +65,8 @@ except Exception as e:
 
 #### Seeing Validation Errors on Exception
 ```python
-import ostiapi
-from ostiapi import Record
+from ostiapi import ostiapi
+from ostiapi.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
 ostiapi.set_target_url('https://review.osti.gov/elink2api/')
@@ -91,12 +97,11 @@ try:
     saved_record = ostiapi.post_new_record(my_record, "save")
 except Exception as e:
     # Handle the exception as needed
-
 ```
 
 #### View Revision History
 ```python
-import ostiapi
+from ostiapi import ostiapi
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -114,7 +119,7 @@ oldest_revision = revision_history[-1]
 
 #### Adding Media to Record
 ```python
-import ostiapi
+from ostiapi import ostiapi
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -130,7 +135,7 @@ except Exception as e:
 
 #### Removing Media from a Record
 ```python
-import ostiapi
+from ostiapi import ostiapi
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -147,7 +152,7 @@ except Exception as e:
 
 #### Compare Two Revision Histories
 ```python
-import ostiapi
+from ostiapi import ostiapi
 
 ostiapi.set_api_token("___Your-API-Token___")
 
@@ -170,133 +175,159 @@ Method:
 > set_api_token(*api_token*)
 
 Returns: The API token that has been set
+
 Params: 
 - *api_token* - **str**: Unique to user API token that can be generated from your E-Link 2.0 Account page
-
+---
 Method: 
 > set_target_url(*url*="https://review.osti.gov/elink2api"):
 
 Returns: The url that has been set
+
 Params: 
 - *url* - **str**: The url to which all other module methods will direct their requests (default: {"https://review.osti.gov/elink2api"})
-
+---
 ### Records
 Method:
 >  get_single_record(*osti_id*)
 
 Returns: Record
-Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
 
+Params:
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+---
 Method:
 >  query_records(*params*)
 
 Returns: List[Records]
+
 Params:
 - *params* - **dict**: See [here](https://review.osti.gov/elink2api/#tag/records/operation/getRecords) for 
     the list of allowed query parameters.
-
+---
 Method:
 >  reserve_doi(*record*)
 
 Returns: Record
+
 Params: 
 - *record* - **Record**: Metadata record that you wish to save to E-Link 2.0
-
+---
 Method:
 >  post_new_record(record, *state*="save")
 
 Returns: Record
+
 Params:
 - *record* - **Record**: Metadata record that you wish to send ("save" or "submit") to E-Link 2.0
 - *state* - **str**: The desired submission *state* of the record ("save" or "submit")  (default: {"save"})
-
+---
 Method:
 >  update_record(*osti_id*, *record*, *state*="save")
 
 Returns: Record
+
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *record* - **Record**: Metadata record that you wish to make the new revision of OSTI ID
 - *state* - **str**: The desired submission *state* of the record ("save" or "submit")  (default: {"save"})
-
+---
 #### Revisions
 Method:
 >  get_revision_by_number(*osti_id*, *revision_number*)
 
 Returns: Record
-Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
-- *revision_number* - **int**: The specific revision number to retrieve (original record is 1 and each revision increments upward by 1)
 
+Params:
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+- *revision_number* - **int**: The specific revision number to retrieve (original record is 1 and each revision increments upward by 1)
+---
 Method:
 >  get_revision_by_date(*osti_id*, *date*)
 
 Returns: Record
-Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
-- *date* - **datetime**: Date on which you wish to search for a revision of a Record
 
+Params:
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+- *date* - **datetime**: Date on which you wish to search for a revision of a Record
+---
 Method:
 >  get_all_revisions(*osti_id*)
 
 Returns: RevisionHistory
-Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
 
+Params:
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+---
+Method:
+> compare_two_revisions(osti_id, left, right)
+
+Returns: List[RevisionComparison]
+
+Params: 
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+- *left* - **int**: The first revision number to retrieve and compare to the right
+- *right* - **int** The second revision number to retrieve and compare to the left
+---
 ### Media
 Method:
 >  get_media(*osti_id*)
 
 Returns: MediaInfo
-Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
 
+Params:
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+---
 Method:
 >  get_media_content(*media_file_id*)
 
 Returns: Byte string of the media file content
+
 Params:
 - *media_file_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
-
+---
 Method:
 >  post_media(*osti_id*, *file_path*, *params*=None)
 
 Returns: MediaInfo
+
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *file_path* - **str**: Path to the media file that will be attached to the Record 
 - *params* - **dict**: "title" that can be associated with the media file
         "url" that points to media if not sending file (default; {None})
-
+---
 Method:
 >  put_media(*osti_id*, *media_id*, *file_path*, *params*=None)
 
 Returns: MediaInfo
+
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *media_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 - *file_path* - **str**: Path to the media file that will replace *media_id* Media
 - *params* - **dict**: "title" that can be associated with the media file
         "url" that points to media if not sending file (default; {None}) 
-
+---
 Method:
 >  delete_all_media(*osti_id*, *reason*)
 
 Returns: True on success, False on failure
-Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
-- *reason* - **str**: *reason* for deleting all media 
 
+Params:
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
+- *reason* - **str**: *reason* for deleting all media 
+---
 Method:
 >  delete_single_media(*osti_id*, *media_id*, *reason*)
 
 Returns: True on success, False on failure
+
 Params:
-- *osti_id* - **int**: ID that uniquely identifies an E-link 2.0 Record
+- *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *media_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 - *reason* - **str**: reason for deleting media
-
+---
 ## Classes
 Each class is a pydantic model that validates the metadata's data types and 
 enumerated values on instantiation of the class.
@@ -465,11 +496,16 @@ Point: {
 ```
 <u>**Example**</u>
 ```python
-{
-    "date_valid_start": "2022-12-04T13:22:45.092+00:00",
-    "date_valid_end": "2023-12-04T13:22:45.092+00:00",
-    "osti_id": 2302081,
-    "revision": 2,
-    "workflow_status": "R"
-}
-```
+[
+    {
+        "pointer": "/edit_reason",
+        "left": "API record creation",
+        "right": "API metadata Update"
+    },
+    {
+        "pointer": "/description",
+        "left": "A custom description. Search on 'Allo-ballo holla olah'.",
+        "right": "A NEW custom description. Search on 'Allo-ballo holla olah'."
+    }
+]
+'```

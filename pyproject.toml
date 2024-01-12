@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ostiapi"
-version = "0.1.11" 
+version = "0.2.11" 
 authors = [
   { name="Jacob Samar", email="samarj@osti.gov" },
 ]
@@ -21,6 +21,9 @@ dependencies = [
     "pydantic", 
     "urllib3==1.26.6"
 ]
+
+[project.optional-dependencies]
+development = ["twine", "build"]
 
 [project.urls]
 Homepage = "https://github.com/pypa/sampleproject"
