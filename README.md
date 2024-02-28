@@ -1,11 +1,11 @@
-# OSTIAPI - A Python Interface for E-Link 2.0
+# OSTIAPI - A Python Interface for E-Link 2.0<a id="ostiapi---a-python-interface-for-e-link-20"></a>
 
 ## Open Questions
 - Still need a license designation
 - Do we want organizational credentials for Pypi test and/or Prod?
 - see about enum for query to elink -- enum doesn't really make a ton of sense. Maybe prepopulated empty dict, would have to look and remove all empty values before urlencode. 
 
-## Table of Contents
+## Table of Contents<a id="table-of-contents"></a>
 - [OSTIAPI - A Python Interface for E-Link 2.0](#ostiapi---a-python-interface-for-e-link-20)
   - [Open Questions](#open-questions)
   - [Table of Contents](#table-of-contents)
@@ -37,27 +37,27 @@
     - [Revision](#revision)
     - [Revision Comparison](#revision-comparison)
 
-## Introduction
+## Introduction<a id="introduction"></a>
 This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation found [here](https://review.osti.gov/elink2api/)) and allows for you to quickly get up and running submitting Records using Python. 
 
-## Installation
+## Installation<a id="installation"></a>
 
-#### Importing the Package from test.pypi.org
+#### Importing the Package from test.pypi.org<a id="importing-the-package-from-testpypiorg"></a>
 1. Install the package, but don't grab the dependencies (pip will attempt to grab everything from the test server, which we do not want): `pip install --index-url https://test.pypi.org/simple/ --no-deps ostiapi`
 2. Now install the other dependencies: `pip install ostiapi`
 3. Or install them separately: `pip install requests pydantic urllib3==1.26.6`
 4. `from ostiapi import ostiapi` will allow you to access the entire API functionality using dot notation. E.g. `ostiapi.set_api_token("Your_API_Token")`
 5. The pydantic classes can be fetched using `from ostiapi.record import Record`
 
-#### Importing the Package from Production PyPI
+#### Importing the Package from Production PyPI<a id="importing-the-package-from-production-pypi"></a>
 1. Install the package: `pip install ostiapi`
 2. `from ostiapi import ostiapi` will allow you to access the entire API functionality using dot notation. E.g. `ostiapi.set_api_token("Your_API_Token")`
 3. The pydantic classes can be fetched using `from ostiapi.record import Record`
 
 
-## Examples
+## Examples<a id="examples"></a>
 
-#### Creating a New Record
+#### Creating a New Record<a id="creating-a-new-record"></a>
 ```python
 from ostiapi import ostiapi
 from ostiapi.record import Record
@@ -81,7 +81,7 @@ except Exception as e:
     # Handle the exception as needed
 ```
 
-#### Seeing Validation Errors on Exception
+#### Seeing Validation Errors on Exception<a id="seeing-validation-errors-on-exception"></a>
 ```python
 from ostiapi import ostiapi
 from ostiapi.record import Record
@@ -117,7 +117,7 @@ except Exception as e:
     # Handle the exception as needed
 ```
 
-#### View Revision History
+#### View Revision History<a id="view-revision-history"></a>
 ```python
 from ostiapi import ostiapi
 
@@ -135,7 +135,7 @@ most_recent_revision = revision_history[0]
 oldest_revision = revision_history[-1]
 ```
 
-#### Adding Media to Record
+#### Adding Media to Record<a id="adding-media-to-record"></a>
 ```python
 from ostiapi import ostiapi
 
@@ -151,7 +151,7 @@ except Exception as e:
     // Handle the exception as needed
 ```
 
-#### Removing Media from a Record
+#### Removing Media from a Record<a id="removing-media-from-a-record"></a>
 ```python
 from ostiapi import ostiapi
 
@@ -168,7 +168,7 @@ except Exception as e:
     # Handle the exception as needed
 ```
 
-#### Compare Two Revision Histories
+#### Compare Two Revision Histories<a id="compare-two-revision-histories"></a>
 ```python
 from ostiapi import ostiapi
 
@@ -186,9 +186,9 @@ except Exception as e:
 ```
 
 
-## Method Documentation
+## Method Documentation<a id="method-documentation"></a>
 
-### Configuration
+### Configuration<a id="configuration"></a>
 Method: 
 > set_api_token(*api_token*)
 
@@ -205,7 +205,7 @@ Returns: The url that has been set
 Params: 
 - *url* - **str**: The url to which all other module methods will direct their requests (default: {"https://review.osti.gov/elink2api"})
 ---
-### Records
+### Records<a id="records"></a>
 Method:
 >  get_single_record(*osti_id*)
 
@@ -250,7 +250,7 @@ Params:
 - *record* - **Record**: Metadata record that you wish to make the new revision of OSTI ID
 - *state* - **str**: The desired submission *state* of the record ("save" or "submit")  (default: {"save"})
 ---
-#### Revisions
+#### Revisions<a id="revisions"></a>
 Method:
 >  get_revision_by_number(*osti_id*, *revision_number*)
 
@@ -287,7 +287,7 @@ Params:
 - *left* - **int**: The first revision number to retrieve and compare to the right
 - *right* - **int** The second revision number to retrieve and compare to the left
 ---
-### Media
+### Media<a id="media"></a>
 Method:
 >  get_media(*osti_id*)
 
@@ -346,26 +346,26 @@ Params:
 - *media_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 - *reason* - **str**: reason for deleting media
 ---
-## Classes
+## Classes<a id="classes"></a>
 Each class is a pydantic model that validates the metadata's data types and 
 enumerated values on instantiation of the class.
 
-### Record
+### Record<a id="record"></a>
 Matches the [Metadata model](https://review.osti.gov/elink2api/#tag/record_model) described in E-Link 2.0's API documentation
 
-### Organization
+### Organization<a id="organization"></a>
 Matches the [Organizations model](https://review.osti.gov/elink2api/#tag/organization_model) described in E-Link 2.0's API documentation
 
-### Person
+### Person<a id="person"></a>
 Matches the [Persons model](https://review.osti.gov/elink2api/#tag/person_model) described in E-Link 2.0's API documentation
 
-### Identifier
+### Identifier<a id="identifier"></a>
 Matches the [Identifiers model](https://review.osti.gov/elink2api/#tag/identifier_model) described in E-Link 2.0's API documentation
 
-### Related Identifier
+### Related Identifier<a id="related-identifiers"></a>
 Matches the [Related Identifiers model](https://review.osti.gov/elink2api/#tag/related_identifier_model) described in E-Link 2.0's API documentation
 
-### Geolocation
+### Geolocation<a id="geolocation"></a>
 <u>Schema</u>
 ```python
 Geolocation: {
@@ -396,7 +396,7 @@ Point: {
 }
 ```
 
-### Media Info
+### Media Info<a id="media-info"></a>
 <u>Schema</u>
 ```python
 [
@@ -477,7 +477,7 @@ Point: {
 }
 ```
 
-### Revision
+### Revision<a id="revision"></a>
 <u>**Schema**</u>
 ```python
 {
@@ -499,7 +499,7 @@ Point: {
 }
 ```
 
-### Revision Comparison
+### Revision Comparison<a id="revision-comparison"></a>
 <u>**Schema**</u>
 ```python
 [
