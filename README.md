@@ -55,7 +55,7 @@ This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation fo
 3. The pydantic classes can be fetched using `from ostiapi.record import Record`
 
 
-### Examples
+## Examples
 
 #### Creating a New Record
 ```python
