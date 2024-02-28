@@ -10,6 +10,9 @@
   - [Open Questions](#open-questions)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
+  - [Installation](#installation)
+      - [Importing the Package from test.pypi.org](#importing-the-package-from-testpypiorg)
+      - [Importing the Package from Production PyPI](#importing-the-package-from-production-pypi)
     - [Examples](#examples)
       - [Creating a New Record](#creating-a-new-record)
       - [Seeing Validation Errors on Exception](#seeing-validation-errors-on-exception)
@@ -36,6 +39,21 @@
 
 ## Introduction
 This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation found [here](https://review.osti.gov/elink2api/)) and allows for you to quickly get up and running submitting Records using Python. 
+
+## Installation
+
+#### Importing the Package from test.pypi.org
+1. Install the package, but don't grab the dependencies (pip will attempt to grab everything from the test server, which we do not want): `pip install --index-url https://test.pypi.org/simple/ --no-deps ostiapi`
+2. Now install the other dependencies: `pip install ostiapi`
+3. Or install them separately: `pip install requests pydantic urllib3==1.26.6`
+4. `from ostiapi import ostiapi` will allow you to access the entire API functionality using dot notation. E.g. `ostiapi.set_api_token("Your_API_Token")`
+5. The pydantic classes can be fetched using `from ostiapi.record import Record`
+
+#### Importing the Package from Production PyPI
+1. Install the package: `pip install ostiapi`
+2. `from ostiapi import ostiapi` will allow you to access the entire API functionality using dot notation. E.g. `ostiapi.set_api_token("Your_API_Token")`
+3. The pydantic classes can be fetched using `from ostiapi.record import Record`
+
 
 ### Examples
 
