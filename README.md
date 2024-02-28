@@ -362,7 +362,7 @@ Matches the [Persons model](https://review.osti.gov/elink2api/#tag/person_model)
 ### Identifier<a id="identifier"></a>
 Matches the [Identifiers model](https://review.osti.gov/elink2api/#tag/identifier_model) described in E-Link 2.0's API documentation
 
-### Related Identifier<a id="related-identifiers"></a>
+### Related Identifier<a id="related-identifier"></a>
 Matches the [Related Identifiers model](https://review.osti.gov/elink2api/#tag/related_identifier_model) described in E-Link 2.0's API documentation
 
 ### Geolocation<a id="geolocation"></a>
@@ -442,10 +442,10 @@ Point: {
         "files": []
     }
 ]
-
 ```
 
-### Media File
+
+### Media File<a id="media-file"></a>
 <u>Schema</u>
 ```python
 {
