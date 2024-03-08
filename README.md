@@ -45,7 +45,7 @@ from ostiapi import ostiapi
 from ostiapi.record import Record
 
 ostiapi.set_api_token("___Your-API-Token___")
-ostiapi.set_target_url('https://dev.osti.gov/elink2api/')
+ostiapi.set_target_url('https://review.osti.gov/elink2api/')
 
 # Record with minimal fields to save
 my_record_json = {

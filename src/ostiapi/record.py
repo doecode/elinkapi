@@ -76,6 +76,7 @@ class Record(BaseModel):
         Book="B"
         Conference="CO"
         Dataset="DA"
+        FactSheet="FS"
         JournalArticle="JA"
         Miscellaneous="MI"
         Other="OT"

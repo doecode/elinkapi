@@ -8,8 +8,7 @@ from .revision_comparison import RevisionComparison
 from .media_info import MediaInfo
 
 this = sys.modules[__name__]
-# this.url = 'https://review.osti.gov/elink2api/'
-this.url = 'https://dev.osti.gov/elink2api/'
+this.url = 'https://review.osti.gov/elink2api/'
 this.api_token = ""
 
 # Define some helpfully-named Exceptions for API issues
