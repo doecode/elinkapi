@@ -39,7 +39,7 @@ class Person(BaseModel):
     orcid: str = None
     phone: str = None
     email: List[str] = None
-    affiliation: List[str] = None
+    affiliations: List[str] = None
     contributor_type: str = None
 
     @field_validator("type")
