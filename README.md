@@ -1,7 +1,7 @@
-# OSTIAPI - A Python Interface for E-Link 2.0<a id="elinkapi---a-python-interface-for-e-link-20"></a>
+# ELINKAPI - A Python Interface for E-Link 2.0<a id="elinkapi---a-python-interface-for-e-link-20"></a>
 
 ## Table of Contents<a id="table-of-contents"></a>
-- [OSTIAPI - A Python Interface for E-Link 2.0](#elinkapi---a-python-interface-for-e-link-20)
+- [ELINKAPI - A Python Interface for E-Link 2.0](#elinkapi---a-python-interface-for-e-link-20)
   - [Open Questions](#open-questions)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
