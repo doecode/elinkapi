@@ -1,10 +1,5 @@
 # OSTIAPI - A Python Interface for E-Link 2.0<a id="ostiapi---a-python-interface-for-e-link-20"></a>
 
-## Open Questions
-- Still need a license designation
-- Do we want organizational credentials for Pypi test and/or Prod?
-- see about enum for query to elink -- enum doesn't really make a ton of sense. Maybe prepopulated empty dict, would have to look and remove all empty values before urlencode. 
-
 ## Table of Contents<a id="table-of-contents"></a>
 - [OSTIAPI - A Python Interface for E-Link 2.0](#ostiapi---a-python-interface-for-e-link-20)
   - [Open Questions](#open-questions)
