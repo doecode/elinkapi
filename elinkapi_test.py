@@ -1,4 +1,4 @@
-import ostiapi
+import elinkapi
 from models.record import Record 
 
 valid_save_json = {
@@ -119,8 +119,8 @@ valid_submit_json = {
  "title": "Sample document title"
 }
 
-# ostiapi.set_api_token("")
-ostiapi.set_api_token("") # dev
+# elinkapi.set_api_token("")
+elinkapi.set_api_token("") # dev
 
 osti_id = "2300069"
 # osti_id = 2300063
@@ -139,52 +139,52 @@ reserved_osti_id = 1
 # Post a new Record
 submitted_record = {}
 try: 
-  submitted_record = ostiapi.post_new_record(Record(**valid_submit_json), "save") # Works - submitted
+  submitted_record = elinkapi.post_new_record(Record(**valid_submit_json), "save") # Works - submitted
 except Exception as e:
   print(e)
 
 
 osti_id = submitted_record.osti_id
 # Fetch single Record from ID
-single_record = ostiapi.get_single_record(osti_id) #works
+single_record = elinkapi.get_single_record(osti_id) #works
 # Query for many Records 
-list_of_records = ostiapi.query_records({"title": "Allo-ballo holla olah"}) # works, nothing found
+list_of_records = elinkapi.query_records({"title": "Allo-ballo holla olah"}) # works, nothing found
 # Reserve a DOI
 try:
-  saved_record = ostiapi.reserve_doi(Record(**valid_save_json)) #works - naved
+  saved_record = elinkapi.reserve_doi(Record(**valid_save_json)) #works - naved
   reserved_osti_id = saved_record.osti_id
 except Exception as e:
   print(f'failed to reserve doi on record')
 # Update an existing Record
-updated_record = ostiapi.update_record(osti_id, Record(**valid_save_update_json), 'submit') #works
+updated_record = elinkapi.update_record(osti_id, Record(**valid_save_update_json), 'submit') #works
 # Get Revision based on revision number
-revision_by_number = ostiapi.get_revision_by_number(osti_id, revision_number) # works
+revision_by_number = elinkapi.get_revision_by_number(osti_id, revision_number) # works
 # Get Revision based on date
-revision_by_date = ostiapi.get_revision_by_date(osti_id, date) # works
+revision_by_date = elinkapi.get_revision_by_date(osti_id, date) # works
 # Get all RevisionHistory of a Record
-revision_history = ostiapi.get_all_revisions(osti_id) # works
+revision_history = elinkapi.get_all_revisions(osti_id) # works
 most_recent_revision = revision_history[0]
 oldest_revision = revision_history[-1]
 
 
 # MEDIA ENDPOINTS
 # Associate new Media with a Record
-posted_media = ostiapi.post_media(osti_id, file_path, {"title": "Title of the Media media_file.txt"})
-posted_media3 = ostiapi.post_media(osti_id, file_path3, {"title": "Title of the Media media_file.txt"})
+posted_media = elinkapi.post_media(osti_id, file_path, {"title": "Title of the Media media_file.txt"})
+posted_media3 = elinkapi.post_media(osti_id, file_path3, {"title": "Title of the Media media_file.txt"})
 media_id = posted_media.media_id
 # Replace existing Media on a Record
-replaced_media2 = ostiapi.put_media(osti_id, media_id, file_path2, {"title": "Changed this title now"})
+replaced_media2 = elinkapi.put_media(osti_id, media_id, file_path2, {"title": "Changed this title now"})
 # Get Media associated with OSTI ID
-media = ostiapi.get_media(osti_id)
+media = elinkapi.get_media(osti_id)
 # Get Media content of a media resource
-media_content = ostiapi.get_media_content(media_id)
+media_content = elinkapi.get_media_content(media_id)
 # Delete Media with media_id off of a Record
-isSuccessDelete = ostiapi.delete_single_media(osti_id, media_id, reason) #works
+isSuccessDelete = elinkapi.delete_single_media(osti_id, media_id, reason) #works
 # Delete all Media associated with a Record 
-isSuccessAllDelete = ostiapi.delete_all_media(osti_id, reason)
+isSuccessAllDelete = elinkapi.delete_all_media(osti_id, reason)
 
 
 # Should see that all media has been deleted
-final_media = ostiapi.get_media(osti_id)
+final_media = elinkapi.get_media(osti_id)
 
 print("Finished")

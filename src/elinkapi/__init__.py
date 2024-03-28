@@ -1,18 +1,18 @@
-from ostiapi.__version__ import __version__
+from elinkapi.__version__ import __version__
 
-from ostiapi.ostiapi import Elink
-from ostiapi.person import Person
-from ostiapi.geolocation import Geolocation
-from ostiapi.identifier import Identifier
-from ostiapi.organization import Organization
-from ostiapi.record import Record
-from ostiapi.media_file import MediaFile
-from ostiapi.media_info import MediaInfo
-from ostiapi.related_identifier import RelatedIdentifier
-from ostiapi.revision_comparison import RevisionComparison
-from ostiapi.revision import Revision
+from elinkapi.elinkapi import Elink
+from elinkapi.person import Person
+from elinkapi.geolocation import Geolocation
+from elinkapi.identifier import Identifier
+from elinkapi.organization import Organization
+from elinkapi.record import Record
+from elinkapi.media_file import MediaFile
+from elinkapi.media_info import MediaInfo
+from elinkapi.related_identifier import RelatedIdentifier
+from elinkapi.revision_comparison import RevisionComparison
+from elinkapi.revision import Revision
 
-from ostiapi.exceptions import (
+from elinkapi.exceptions import (
     NotFoundException,
     BadRequestException,
     UnauthorizedException,
