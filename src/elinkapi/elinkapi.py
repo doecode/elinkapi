@@ -39,10 +39,16 @@ class Elink:
         elif response.status_code == 400:
             # attempt to load as JSON; if this fails, must be simple bad request exception
             try:
-                raise ValidationException((json.loads(response.text)["errors"]))
+                json_response = json.loads(response.text)
+
+                # ensure the JSON response contains "errors"; if not, simple bad request
+                if isinstance(json_response, dict) and 'errors' in json_response:
+                    raise ValidationException(json_response['errors'])
+                else:
+                    raise BadRequestException(response.text)
             except json.JSONDecodeError as je:
-                # must be a simple bad request
-                raise BadRequestException("Unable to parse: {response.text}")
+                # JSON was not interpretable
+                raise ServerException("Unable to parse: {response.text}")
         elif response.status_code == 401:
             raise UnauthorizedException('No user account information supplied.')
         elif response.status_code == 403:
@@ -70,8 +76,14 @@ class Elink:
         return_val = []
         all_media_info = json.loads(response.text)
 
-        for media in all_media_info:
-            return_val.append(MediaInfo(**media))
+        """ ensure the API response is a singleton or array of media info. """
+        if isinstance(all_media_info, dict):
+            # singleton instance response
+            return_val.append(MediaInfo(**all_media_info))
+        else:
+            # array of objects
+            for media in all_media_info:
+                return_val.append(MediaInfo(**media))
 
         return return_val
 
@@ -181,7 +193,11 @@ class Elink:
         Returns:
             Record - metadata of a single record saved (or submitted) to E-Link 2.0
         """
-        response = requests.post(f"{self.target}records/{state}", headers={"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}, 
+        response = requests.post(f"{self.target}records/{state}", 
+                                 headers={
+                                     "Authorization": f"Bearer {self.token}", 
+                                     "Content-Type": "application/json" 
+                                    }, 
                                  json=json.loads(record.model_dump_json(exclude_none=True)))
 
         self._check_status_code(response)
@@ -202,7 +218,10 @@ class Elink:
         Returns:
             Record - Metadata of record updated with the given information, creating a new revision
         """
-        response = requests.put(f"{self.target}records/{osti_id}/{state}", headers={"Authorization": f"Bearer {self.token}"}, 
+        response = requests.put(f"{self.target}records/{osti_id}/{state}", 
+                                headers={
+                                    "Authorization": f"Bearer {self.token}"
+                                }, 
                                 json=json.loads(record.model_dump_json(exclude_none=True)))
 
         self._check_status_code(response)
@@ -220,7 +239,10 @@ class Elink:
         Returns:
             Record - The metadata of the Record at the given revision number
         """
-        response = requests.get(f"{self.target}records/revision/{osti_id}/at/{revision_number}", headers={"Authorization": f"Bearer {self.token}"})
+        response = requests.get(f"{self.target}records/revision/{osti_id}/at/{revision_number}", 
+                                headers={
+                                    "Authorization": f"Bearer {self.token}"
+                                })
         
         # Special case on this exception -> Get 404's when date is before record creation
         if(response.status_code == 404): 
@@ -241,7 +263,8 @@ class Elink:
         Returns:
             Record - The metadata of the Record on the given date
         """
-        response = requests.get(f"{self.target}records/revision/{osti_id}/dated/{date}", headers={"Authorization": f"Bearer {self.token}"})
+        response = requests.get(f"{self.target}records/revision/{osti_id}/dated/{date}", 
+                                headers={"Authorization": f"Bearer {self.token}"})
 
         # Special case on this exception -> Get 404's when date is before record creation
         if(response.status_code == 404): 
@@ -261,7 +284,8 @@ class Elink:
         Returns:
             RevisionHistory - All the metadata of the revisions of a record
         """
-        response = requests.get(f"{self.target}records/revision/{osti_id}", headers={"Authorization": f"Bearer {self.token}"})
+        response = requests.get(f"{self.target}records/revision/{osti_id}", 
+                                headers={"Authorization": f"Bearer {self.token}"})
 
         self._check_status_code(response)
         
@@ -278,7 +302,8 @@ class Elink:
         Returns:
             List[RevisionComparison]
         """
-        response = requests.get(f"{self.target}records/revision/{osti_id}/compare/{left}/{right}", headers={"Authorization": f"Bearer {self.token}"})
+        response = requests.get(f"{self.target}records/revision/{osti_id}/compare/{left}/{right}", 
+                                headers={"Authorization": f"Bearer {self.token}"})
 
         self._check_status_code(response)
         
@@ -295,8 +320,9 @@ class Elink:
         Returns:
             List[MediaInfo] - info on all the media associated with the osti_id
         """
-        response = requests.get(self.target + "media/" + osti_id, headers={"Authorization": f"Bearer {self.token}"})
-
+        response = requests.get(f'{self.target}media/{osti_id}',
+                                headers = { "Authorization" : f"Bearer {self.token}" })
+        
         self._check_status_code(response)
         
         return self._convert_response_to_media_info(response)
@@ -310,63 +336,97 @@ class Elink:
         Returns:
             Binary string that is the content associated with the media_file_id
         """
-        response = requests.get(f"{self.target}media/file/{media_file_id}", headers={"Authorization": f"Bearer {self.token}"})
+        response = requests.get(f"{self.target}media/file/{media_file_id}", 
+                                headers={"Authorization": f"Bearer {self.token}"})
 
         self._check_status_code(response)
         
         return response.content
 
-    def post_media(self, osti_id, file_path, params=None):
+    def post_media(self, osti_id, file_path=None, title=None, url=None):
         """Attach the media found at the given filepath to the record associated
         with the given osti_id. Optionally can provide 2 params: a title for the media file, and, 
         if not providing a file, a url that leads to the media.
 
         Arguments:
             osti_id -- ID that uniquely identifies an E-link 2.0 Record
-            file_path -- Path to the media file that will be attached to the Record 
 
         Keyword Arguments:
-            params -- "title" that can be associated with the media file
-                    "url" that points to media if not sending file (default; {None})
+            title -- optional "title" for media file
+            url -- off-site URL to associate (only allowed for datasets)
+            file_path -- filesystem path to upload and  associate with this metadata
             
         Returns:
             MediaInfo 
         """
         query_params = ""
+        parameters = {}
 
-        if(len(params) > 0):
-            query_params = "?" + urlencode(params)
+        """ 
+        If optional parameters specified, these must be passed encoded. 
 
-        response = requests.post(f"{self.target}media/{osti_id}{query_params}", headers={"Authorization": f"Bearer {self.token}"}, files={'file': file_path})
+        Only "url" and "title" are allowed.
+        """
+        if url is not None:
+            parameters['url'] = url
+        if title is not None:
+            parameters['title'] = title
 
+        if(len(parameters) > 0):
+            query_params = "?" + urlencode(parameters)
+
+        # if posting a FILE, send that; if not, send just the PARAMETERS
+        if file_path is not None:
+            response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                                     headers = { "Authorization" : f"Bearer {self.token}" },
+                                     files={ 'file' : file_path})
+        else:
+            response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                                     headers = { "Authorization" : f"Bearer {self.token}",
+                                                 "Content-Type" : "application/json" })
+            
         self._check_status_code(response)
 
         return self._convert_response_to_media_info(response)
 
-    def put_media(self, osti_id, media_id, file_path, params=None):
+    def put_media(self, osti_id, media_id, file_path=None, title=None, url=None):
         """Replace a given media set with a new basis; either a URL or a media file.
         This will replace the previous media set
 
         Arguments:
             osti_id -- ID that uniquely identifies an E-link 2.0 Record
             media_id -- ID that uniquely identifies a media file associated with an E-Link 2.0 Record
-            file_path -- Path to the media file that will replace media_id Media
 
-        Keyword Arguments:
-            params -- "title" that can be associated with the media file
-                    "url" that points to media if not sending file (default; {None})
+        Optional Arguments:
+            file_path -- Path to the media file that will replace media_id Media
+            title -- Optional title to be associated with this media
+            url -- off-site URL to replace this media with
 
         Returns:
             MediaInfo
         """
         query_params = ""
+        parameters = {}
 
-        if(len(params) > 0):
-            query_params = "?" + urlencode(params)
+        """
+        As with POST, only accepts "url" or "title" optional parameters.
+        """
+        if title is not None:
+            parameters['title'] = title
+        if url is not None:
+            parameters['url'] = url
 
-        response = requests.put(f"{self.target}media/{osti_id}/{media_id}{query_params}", 
-                                headers={"Authorization": f"Bearer {self.token}"}, 
+        if(len(parameters) > 0):
+            query_params = "?" + urlencode(parameters)
+
+        if file_path is not None:
+            response = requests.put(f"{self.target}media/{osti_id}/{media_id}{query_params}", 
+                                headers={ "Authorization" : f"Bearer {self.token}" },
                                 files={'file': open(file_path, 'rb')})
+        else:
+            response = requests.put(f"{self.target}/media/{osti_id}/{media_id}{query_params}",
+                                    headers = { "Authorization" : f"Bearer {self.token}",
+                                                "Content-Type" : "application/json"})
 
         self._check_status_code(response)
         
