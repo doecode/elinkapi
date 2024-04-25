@@ -179,7 +179,7 @@ class Elink:
 
         self._check_status_code(response)
         
-        return self._convert_response_to_records(response)
+        return self._convert_response_to_records(response)[0]
 
     def post_new_record(self, record, state="save"):
         """Create a new metadata Record with OSTI
