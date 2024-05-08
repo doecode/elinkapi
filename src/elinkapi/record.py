@@ -136,7 +136,7 @@ class Record(BaseModel):
     opn_document_categories: List[str] = None
     opn_document_location: str = None
     opn_fieldoffice_acronym_code: str = None
-    other_information: list[str] = None
+    other_information: List[str] = None
     ouo_release_date: datetime.date = None
     pams_publication_status: int = None
     pams_publication_status_other: str = None
