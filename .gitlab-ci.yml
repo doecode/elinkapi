@@ -1,0 +1,7 @@
+stages:
+  - test
+
+include:
+  - project: "ci-cd/shared-ci"
+    file: 
+      - "/dependency-scanning/security.yml"
