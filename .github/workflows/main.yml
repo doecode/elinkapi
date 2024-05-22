@@ -13,4 +13,19 @@ jobs:
         input: ./requirements.txt
         output: ./bom.json
         format: json
+
+    - name: Upload SBOM artifact
+      uses: action/upload-artifact@v2
+      with:
+        name: SBOM
+        path: ./bom.json
+
+    - name: Commit SBOM to repo
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add bom.json
+        git commit -m "Adding SBOM"
+        git push
+        
         
