@@ -62,6 +62,7 @@ This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation fo
 ## Examples<a id="examples"></a>
 
 #### Creating a New Record<a id="creating-a-new-record"></a>
+Note: Ensure site_ownership_code is a value to which your user account token has sufficient access to create records.
 ```python
 from elinkapi import Elink, Record, exceptions
 
@@ -581,7 +582,7 @@ Generally raised when no API token value is provided when accessing E-Link.
 
 ### ForbiddenException<a id="forbidden-exception"></a>
 
-Raised when attempting to query records, post new content to a site, or update records to which the API token has no permission.
+Raised when attempting to query records, post new content to a site, or create/update records to which the API token has no permission.
 
 ### BadRequestException<a id="bad-request-exception"></a>
 

@@ -52,10 +52,9 @@ class Elink:
         elif response.status_code == 401:
             raise UnauthorizedException('No user account information supplied.')
         elif response.status_code == 403:
-            raise ForbiddenException('User account failed login or authentication.')
+            raise ForbiddenException(response.text)
         elif response.status_code == 404:
             raise NotFoundException(response.text)
-            # raise NotFoundException("Record is not on file.")
         elif response.status_code == 409:
             raise ConflictException("Conflict, URL or file is already associated with this record.")
         else: # 500

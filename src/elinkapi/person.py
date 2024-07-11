@@ -1,6 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List
+from .affiliation import Affiliation
 
 class Person(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
@@ -15,7 +16,6 @@ class Person(BaseModel):
         BUSINESS_OFFICIAL="SBIZ_BO"
         PRINCIPAL_INVESTIGATOR="SBIZ_PI"
     class Contribution(Enum):
-        ContactPerson='ContactPerson'
         DataCollector="DataCollector"
         DataCurator="DataCurator"
         DataManager="DataManager"
@@ -39,7 +39,7 @@ class Person(BaseModel):
     orcid: str = None
     phone: str = None
     email: List[str] = None
-    affiliations: List[str] = None
+    affiliations: List[Affiliation] = None
     contributor_type: str = None
 
     @field_validator("type")
@@ -61,9 +61,12 @@ class Person(BaseModel):
             self.email = []
         self.email.append(address)
 
-    def add_affiliation(self, name: str):
+    """
+    Add an affiliation to this Person.
+    """
+    def add_affiliation(self, affiliation: Affiliation):
         if self.affiliations is None:
             self.affiliations = []
-        self.affiliations.append(name)
+        self.affiliations.append(affiliation)
 
     

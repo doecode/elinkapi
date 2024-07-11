@@ -2,9 +2,11 @@ from enum import Enum
 from .identifier import Identifier
 from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List
+import re
 
 class Organization(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
+    __ROR_ID_PATTERN = re.compile("^(?:(?:(http(s?):\/\/)?(?:ror\.org\/)))?(0[a-hj-km-np-tv-z|0-9]{6}[0-9]{2})$")
 
     class Type(Enum):
         AUTHOR="AUTHOR"
@@ -38,6 +40,7 @@ class Organization(BaseModel):
     name:str
     contributor_type: str = None
     identifiers: List[Identifier] = None
+    ror_id:str = None
 
     @field_validator("type")
     @classmethod
@@ -55,6 +58,15 @@ class Organization(BaseModel):
 
     def _add_identifier(self, identifier):
         self.identifiers.append(identifier)
+
+    
+    @field_validator("ror_id")
+    @classmethod
+    def validate_ror_id(cls, value: str) -> str:
+        if value is not None and not cls.__ROR_ID_PATTERN.fullmatch(value):
+            raise ValueError("Invalid ROR ID value.")
+        return value
+
 
     """
     Add an identifier to this Organization.
