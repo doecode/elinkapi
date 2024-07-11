@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from .utils import Validation
 
 class Affiliation(BaseModel):
@@ -12,6 +12,12 @@ class Affiliation(BaseModel):
 
     name:str = None
     ror_id:str = None
+
+    @model_validator(mode = 'after')
+    def name_or_ror(self):
+        if not self.name and not self.ror_id:
+            raise ValueError("Either name and/or ROR ID value is required.")
+        return self
 
     @field_validator("ror_id")
     @classmethod
