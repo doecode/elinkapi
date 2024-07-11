@@ -1,9 +1,9 @@
 annotated-types==0.7.0
-certifi==2024.2.2
+certifi==2024.07.04
 charset-normalizer==3.3.2
 idna==3.7
 pydantic==2.7.1
 pydantic_core==2.18.2
 requests==2.32.2
 typing_extensions==4.11.0
-urllib3==2.2.1
+urllib3==2.2.2
