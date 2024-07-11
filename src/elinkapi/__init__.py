@@ -2,6 +2,7 @@ from elinkapi.__version__ import __version__
 
 from elinkapi.elinkapi import Elink
 from elinkapi.person import Person
+from elinkapi.affiliation import Affiliation
 from elinkapi.geolocation import Geolocation
 from elinkapi.identifier import Identifier
 from elinkapi.organization import Organization
@@ -38,6 +39,7 @@ __all__ = (
     "Record",
     "Geolocation",
     "Person",
+    "Affiliation",
     "Organization",
     "Identifier",
     "RelatedIdentifier",
