@@ -18,7 +18,6 @@ from elinkapi.exceptions import (
     BadRequestException,
     UnauthorizedException,
     ForbiddenException,
-    ValidationException,
     ServerException,
     ConflictException
 )
@@ -32,7 +31,6 @@ __all__ = (
     "ServerException",
     "ConflictException",
     "ForbiddenException",
-    "ValidationException",
     # connector
     "Elink",
     # class types

@@ -1,7 +1,7 @@
 import requests
 from urllib.parse import urlencode
 import json
-from .exceptions import ValidationException,NotFoundException,ForbiddenException,UnauthorizedException,ServerException,ConflictException,BadRequestException
+from .exceptions import NotFoundException,ForbiddenException,UnauthorizedException,ServerException,ConflictException,BadRequestException
 from .record import Record
 from .revision import Revision
 from .revision_comparison import RevisionComparison
@@ -28,7 +28,7 @@ class Elink:
             ForbiddenException: User is not allowed to access
             NotFoundException: Requested object could not be found
             ConflictException: Resource already exists
-            ValidationException: Issue with the submitted json, see error message for details
+            BadRequestException: Issue with the submitted json, see error message for details
             ServerException: Unknown error
 
         Returns:
@@ -37,18 +37,7 @@ class Elink:
         if response.status_code in [200, 201, 204]:
             return response
         elif response.status_code == 400:
-            # attempt to load as JSON; if this fails, must be simple bad request exception
-            try:
-                json_response = json.loads(response.text)
-
-                # ensure the JSON response contains "errors"; if not, simple bad request
-                if isinstance(json_response, dict) and 'errors' in json_response:
-                    raise ValidationException(json_response['errors'])
-                else:
-                    raise BadRequestException(response.text)
-            except json.JSONDecodeError as je:
-                # JSON was not interpretable
-                raise ServerException("Unable to parse: {response.text}")
+            raise BadRequestException(response.text)
         elif response.status_code == 401:
             raise UnauthorizedException('No user account information supplied.')
         elif response.status_code == 403:
