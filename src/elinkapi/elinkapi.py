@@ -379,7 +379,7 @@ class Elink:
         if file_path is not None:
             response = requests.post(f'{self.target}media/{osti_id}{query_params}',
                                      headers = { "Authorization" : f"Bearer {self.token}" },
-                                     files={ 'file' : file_path})
+                                     files={ 'file' : open(file_path, 'rb') })
         else:
             response = requests.post(f'{self.target}media/{osti_id}{query_params}',
                                      headers = { "Authorization" : f"Bearer {self.token}",
