@@ -331,7 +331,7 @@ class Elink:
         
         return response.content
 
-    def post_media(self, osti_id, file_path=None, title=None, url=None):
+    def post_media(self, osti_id, file_path=None, title=None):
         """Attach the media found at the given filepath to the record associated
         with the given osti_id. Optionally can provide 2 params: a title for the media file, and, 
         if not providing a file, a url that leads to the media.
@@ -341,7 +341,6 @@ class Elink:
 
         Keyword Arguments:
             title -- optional "title" for media file
-            url -- off-site URL to associate (only allowed for datasets)
             file_path -- filesystem path to upload and  associate with this metadata
             
         Returns:
@@ -353,10 +352,8 @@ class Elink:
         """ 
         If optional parameters specified, these must be passed encoded. 
 
-        Only "url" and "title" are allowed.
+        Title is passed as an optional query parameter
         """
-        if url is not None:
-            parameters['url'] = url
         if title is not None:
             parameters['title'] = title
 
@@ -367,17 +364,15 @@ class Elink:
         if file_path is not None:
             response = requests.post(f'{self.target}media/{osti_id}{query_params}',
                                      headers = { "Authorization" : f"Bearer {self.token}" },
-                                     files={ 'file' : file_path})
+                                     files={ 'file' : open(file_path, 'rb') })
         else:
-            response = requests.post(f'{self.target}media/{osti_id}{query_params}',
-                                     headers = { "Authorization" : f"Bearer {self.token}",
-                                                 "Content-Type" : "application/json" })
+            raise ValueError("File path is missing.")
             
         self._check_status_code(response)
 
         return self._convert_response_to_media_info(response)
 
-    def put_media(self, osti_id, media_id, file_path=None, title=None, url=None):
+    def put_media(self, osti_id, media_id, file_path=None, title=None):
         """Replace a given media set with a new basis; either a URL or a media file.
         This will replace the previous media set
 
@@ -388,7 +383,6 @@ class Elink:
         Optional Arguments:
             file_path -- Path to the media file that will replace media_id Media
             title -- Optional title to be associated with this media
-            url -- off-site URL to replace this media with
 
         Returns:
             MediaInfo
@@ -397,12 +391,10 @@ class Elink:
         parameters = {}
 
         """
-        As with POST, only accepts "url" or "title" optional parameters.
+        As with POST, only accepts "title" optional parameter.
         """
         if title is not None:
             parameters['title'] = title
-        if url is not None:
-            parameters['url'] = url
 
         if(len(parameters) > 0):
             query_params = "?" + urlencode(parameters)
@@ -412,9 +404,7 @@ class Elink:
                                 headers={ "Authorization" : f"Bearer {self.token}" },
                                 files={'file': open(file_path, 'rb')})
         else:
-            response = requests.put(f"{self.target}/media/{osti_id}/{media_id}{query_params}",
-                                    headers = { "Authorization" : f"Bearer {self.token}",
-                                                "Content-Type" : "application/json"})
+            raise ValueError("No file URL specified to PUT.")
 
         self._check_status_code(response)
         
