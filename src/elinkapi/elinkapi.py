@@ -6,6 +6,8 @@ from .record import Record
 from .revision import Revision
 from .revision_comparison import RevisionComparison
 from .media_info import MediaInfo
+from .utils import Validation
+from .query import Query
 
 class Elink:
     def __init__(self, token=None, target=None):
@@ -14,40 +16,6 @@ class Elink:
         """
         self.token = token
         self.target = target or "https://review.osti.gov/elink2api/"
-
-    # Internally used methods
-    def _check_status_code(self, response):
-        """Evaluates the response and selects the appropriate action based on 
-        the status code 
-
-        Arguments:
-            response -- response from E-Link 2.0
-
-        Raises:
-            UnauthorizedException: API token not provided with request
-            ForbiddenException: User is not allowed to access
-            NotFoundException: Requested object could not be found
-            ConflictException: Resource already exists
-            BadRequestException: Issue with the submitted json, see error message for details
-            ServerException: Unknown error
-
-        Returns:
-            Either the successful response or the appropriate exception is raised
-        """
-        if response.status_code in [200, 201, 204]:
-            return response
-        elif response.status_code == 400:
-            raise BadRequestException(response.text)
-        elif response.status_code == 401:
-            raise UnauthorizedException('No user account information supplied.')
-        elif response.status_code == 403:
-            raise ForbiddenException(response.text)
-        elif response.status_code == 404:
-            raise NotFoundException(response.text)
-        elif response.status_code == 409:
-            raise ConflictException("Conflict, URL or file is already associated with this record.")
-        else: # 500
-            raise ServerException('ELINK service is not available or unknown connection error.')
 
     def _convert_response_to_records(self, response):
         """Returns array of Records"""
@@ -122,7 +90,7 @@ class Elink:
         """
         response = requests.get(f'{self.target}/records/{osti_id}',
                                 headers = { "Authorization" : f"Bearer {self.token}"})
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         # returns array, so grab the first element
         return self._convert_response_to_records(response)[0]
@@ -145,9 +113,9 @@ class Elink:
         response = requests.get(f"{self.target}/records{query_params}", 
                                 headers={"Authorization": f"Bearer {self.token}"})
         
-        self._check_status_code(response)
-        
-        return self._convert_response_to_records(response)
+        Validation.handle_response(response)
+
+        return Query(response, target=self.target, token=self.token)
 
     def reserve_doi(self, record):
         """ Save a Record with minimal validations: 
@@ -165,7 +133,7 @@ class Elink:
         response = requests.post(self.target+ "records/save", headers={"Authorization": f"Bearer {self.token}"}, 
                                  json=json.loads(record.model_dump_json(exclude_none=True)))
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         return self._convert_response_to_records(response)[0]
 
@@ -188,7 +156,7 @@ class Elink:
                                     }, 
                                  json=json.loads(record.model_dump_json(exclude_none=True)))
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
 
         # returns array, so grab the first element
         return self._convert_response_to_records(response)[0] 
@@ -212,7 +180,7 @@ class Elink:
                                 }, 
                                 json=json.loads(record.model_dump_json(exclude_none=True)))
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         # returns array, so grab the first element
         return self._convert_response_to_records(response)[0]
@@ -236,7 +204,7 @@ class Elink:
         if(response.status_code == 404): 
             raise NotFoundException("Requested record version is not on file.")
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
 
         # returns array, so grab the first element
         return self._convert_response_to_records(response)[0]
@@ -258,7 +226,7 @@ class Elink:
         if(response.status_code == 404): 
             raise NotFoundException("Record version for specified date is not on file.")
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         # returns array, so grab the first element
         return self._convert_response_to_records(response)[0]
@@ -275,7 +243,7 @@ class Elink:
         response = requests.get(f"{self.target}records/revision/{osti_id}", 
                                 headers={"Authorization": f"Bearer {self.token}"})
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         return self._convert_response_to_revision_history(response)
 
@@ -293,7 +261,7 @@ class Elink:
         response = requests.get(f"{self.target}records/revision/{osti_id}/compare/{left}/{right}", 
                                 headers={"Authorization": f"Bearer {self.token}"})
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         return self._convert_response_to_revision_comparison(response)
 
@@ -311,7 +279,7 @@ class Elink:
         response = requests.get(f'{self.target}media/{osti_id}',
                                 headers = { "Authorization" : f"Bearer {self.token}" })
         
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         return self._convert_response_to_media_info(response)
 
@@ -327,7 +295,7 @@ class Elink:
         response = requests.get(f"{self.target}media/file/{media_file_id}", 
                                 headers={"Authorization": f"Bearer {self.token}"})
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         return response.content
 
@@ -368,7 +336,7 @@ class Elink:
         else:
             raise ValueError("File path is missing.")
             
-        self._check_status_code(response)
+        Validation.handle_response(response)
 
         return self._convert_response_to_media_info(response)
 
@@ -406,7 +374,7 @@ class Elink:
         else:
             raise ValueError("No file URL specified to PUT.")
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         return self._convert_response_to_media_info(response)
 
@@ -423,7 +391,7 @@ class Elink:
         """
         response = requests.delete(f"{self.target}media/{osti_id}/{media_id}?reason={reason}", headers={"Authorization": f"Bearer {self.token}"})
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
 
         if(response.status_code == 204): 
             return int(response.headers['x-total-count'])
@@ -440,7 +408,7 @@ class Elink:
         """
         response = requests.delete(f"{self.target}media/{osti_id}?reason={reason}", headers={"Authorization": f"Bearer {self.token}"})
 
-        self._check_status_code(response)
+        Validation.handle_response(response)
         
         if(response.status_code == 204): 
             return int(response.headers['x-total-count'])

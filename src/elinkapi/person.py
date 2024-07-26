@@ -33,7 +33,7 @@ class Person(BaseModel):
         Other="Other"
 
     type: str
-    first_name: str
+    first_name: str = None
     middle_name: str = None
     last_name: str
     orcid: str = None

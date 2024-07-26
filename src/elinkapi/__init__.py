@@ -12,6 +12,7 @@ from elinkapi.media_info import MediaInfo
 from elinkapi.related_identifier import RelatedIdentifier
 from elinkapi.revision_comparison import RevisionComparison
 from elinkapi.revision import Revision
+from elinkapi.query import Query
 
 from elinkapi.exceptions import (
     NotFoundException,
@@ -45,6 +46,7 @@ __all__ = (
     "MediaInfo",
     "Revision",
     "RevisionComparison",
+    "Query",
     # method accessors
     "set_api_token",
     "set_target_url",

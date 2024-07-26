@@ -15,6 +15,7 @@
       - [Adding Media to Record](#adding-media-to-record)
       - [Removing Media from a Record](#removing-media-from-a-record)
       - [Compare Two Revision Histories](#compare-two-revision-histories)
+      - [Searching and pagination](#searching-and-pagination)
   - [Method Documentation](#method-documentation)
     - [Configuration](#configuration)
     - [Records](#records)
@@ -22,6 +23,7 @@
     - [Media](#media)
   - [Classes](#classes)
     - [Record](#record)
+    - [Query](#query)
     - [Organization](#organization)
     - [Person](#person)
     - [Identifier](#identifier)
@@ -198,6 +200,22 @@ except Exception as e:
     # Handle the exception as needed
 ```
 
+#### Searching and pagination<a id="searching-and-pagination"></a>
+```python
+from elinkapi import Elink, Query
+
+api  = Elink(token = "___Your-API-Token___")
+
+query = api.query_records(title = "science", product_type = "JA")
+
+# see number of results
+print (f"Query matched {query.total_rows} records")
+
+# paginate through ALL results using iterator
+for page in query:
+    for record in page.data:
+        print (f"OSTI ID: {record.osti_id} Title: {record.title}")
+```
 
 ## Method Documentation<a id="method-documentation"></a>
 
@@ -250,7 +268,7 @@ Example:
 api.query_records(title="science")
 ```
 
-Returns: List[Records]
+Returns: Query object
 
 Params:
 - *params* - **dict**: See [here](https://review.osti.gov/elink2api/#tag/records/operation/getRecords) for 
@@ -385,12 +403,23 @@ Each class is a pydantic model that validates the metadata's data types and
 enumerated values on instantiation of the class.  Each may be imported directly:
 
 ```python
-from elinkapi import Record, Organization, Person, Identifier, RelatedIdentifier, Geolocation, MediaInfo, MediaFile
+from elinkapi import Record, Organization, Person, Query, Identifier, RelatedIdentifier, Geolocation, MediaInfo, MediaFile
 from elinkapi import Revision, RevisionComparison
 ```
 
 ### Record<a id="record"></a>
 Matches the [Metadata model](https://review.osti.gov/elink2api/#tag/record_model) described in E-Link 2.0's API documentation
+
+### Query<a id="query"></a>
+Produced by API query searches, enables pagination and access to total count of rows matching the query.  Query is iterable, and may
+use Python constructs to paginate all results as desired.
+
+Provides:
+- *total_rows* - **int**: Total count of records matching the query
+- *data* - **list[Record]**: Records on the current page of query results
+- *has_next()* - **boolean**: True if there are more results to be fetched
+- *has_previous()* - **boolean**: True if there is a previous page of results
+
 
 ### Organization<a id="organization"></a>
 Matches the [Organizations model](https://review.osti.gov/elink2api/#tag/organization_model) described in E-Link 2.0's API documentation
