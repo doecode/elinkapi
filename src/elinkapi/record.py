@@ -1,5 +1,6 @@
 from enum import Enum
 from .identifier import Identifier
+from .media_info import MediaInfo
 from .person import Person
 from .related_identifier import RelatedIdentifier
 from .organization import Organization
@@ -8,119 +9,110 @@ from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List
 import datetime
 
+class AccessLimitation(Enum):
+    UNL="Unlimited"
+    OPN="Opennet"
+    CPY="Copyright"
+    CUI="Controlled Unclassified Information"
+    OUO="Official Use Only"
+    ECI="Export-controlled Information"
+    SSI="Security sensitive information"
+    PROT="Protected data"
+    PAT="Patented information"
+    LRD="Limited Rights Data"
+    PDOUO="Program-determined OUO"
+    NNPI="Naval Navication Propulsion Information"
+    INTL="International Data"
+
+class JournalType(Enum):
+    Manuscript="FT"
+    DOEAcceptedManuscript="AM"
+    DOEAcceptedManuscriptNoDOI="AW"
+    PublishedArticle="PA"
+    PublishedAcceptedManuscript="PM"
+
+class PAMSPublicationStatus(Enum):
+    Published=1
+    AwaitingPublication=2
+    Accepted=3
+    UnderReview=4
+    Submitted=5
+    Other=0
+
+class PAMSPatentStatus(Enum):
+    Submitted=1
+    Pending=2
+    Granted=3
+
+class PAMSProductSubType(Enum):
+    JournalArticle=1
+    Book=2
+    BookChapter=3
+    ThesisDissertation=4
+    ConferencePaper=5
+    Website=6
+    OtherPublication=7
+    Patent=8
+    Invention=9
+    License=10
+    AudioVideo=11
+    Databases=12
+    DataResearchMaterial=13
+    EducationAidsCurricula=14
+    EvaluationInstruments=15
+    InstrumentsEquipment=16
+    Models=17
+    PhysicalCollections=18
+    Protocols=19
+    SoftwareNetWare=20
+    SurveyInstruments=21
+    OtherAwardProduct=22
+    TechnologyTechnique=23
+
+class ProductType(Enum):
+    AccomplishmentReport="AR"
+    Book="B"
+    Conference="CO"
+    Dataset="DA"
+    FactSheet="FS"
+    JournalArticle="JA"
+    Miscellaneous="MI"
+    Other="OT"
+    Patent="P"
+    ProgramDocument="PD"
+    SoftwareManual="SM"
+    ThesisDissertation="TD"
+    TechnicalReport="TR"
+    DataCollection="DC"
+    DataProject="DP"
+    EngineeringDrawing="ED"
+    LegalDocument="LD"
+    NewsStory="NS"
+    PatentApplication="PA"
+    SerialPublication="SP"
+
 class Record(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
-    class AccessLimitation(Enum):
-        UNL="Unlimited"
-        OPN="Opennet"
-        CPY="Copyright"
-        CUI="Controlled Unclassified Information"
-        OUO="Official Use Only"
-        ECI="Export-controlled Information"
-        SSI="Security sensitive information"
-        PROT="Protected data"
-        PAT="Patented information"
-        LRD="Limited Rights Data"
-        PDOUO="Program-determined OUO"
-        NNPI="Naval Navication Propulsion Information"
-        INTL="International Data"
-
-    class JournalType(Enum):
-        Manuscript="FT"
-        DOEAcceptedManuscript="AM"
-        DOEAcceptedManuscriptNoDOI="AW"
-        PublishedArticle="PA"
-        PublishedAcceptedManuscript="PM"
-
-    class PAMSPublicationStatus(Enum):
-        Published=1
-        AwaitingPublication=2
-        Accepted=3
-        UnderReview=4
-        Submitted=5
-        Other=0
-
-    class PAMSPatentStatus(Enum):
-        Submitted=1
-        Pending=2
-        Granted=3
-
-    class PAMSProductSubType(Enum):
-        JournalArticle=1
-        Book=2
-        BookChapter=3
-        ThesisDissertation=4
-        ConferencePaper=5
-        Website=6
-        OtherPublication=7
-        Patent=8
-        Invention=9
-        License=10
-        AudioVideo=11
-        Databases=12
-        DataResearchMaterial=13
-        EducationAidsCurricula=14
-        EvaluationInstruments=15
-        InstrumentsEquipment=16
-        Models=17
-        PhysicalCollections=18
-        Protocols=19
-        SoftwareNetWare=20
-        SurveyInstruments=21
-        OtherAwardProduct=22
-        TechnologyTechnique=23
-
-    class ProductType(Enum):
-        AccomplishmentReport="AR"
-        Book="B"
-        Conference="CO"
-        Dataset="DA"
-        FactSheet="FS"
-        JournalArticle="JA"
-        Miscellaneous="MI"
-        Other="OT"
-        Patent="P"
-        ProgramDocument="PD"
-        SoftwareManual="SM"
-        ThesisDissertation="TD"
-        TechnicalReport="TR"
-        DataCollection="DC"
-        DataProject="DP"
-        EngineeringDrawing="ED"
-        LegalDocument="LD"
-        NewsStory="NS"
-        PatentApplication="PA"
-        SerialPublication="SP"
-        
     osti_id: int = None
-    revision: int = None
     workflow_status: str = None
     access_limitations: List[str] = None
     access_limitation_other: str = None
-    added_by: int = None
     announcement_codes: List[str] = None
     availability: str = None
     edition: str = None
     volume: str = None
-    collection_type: str = None
     conference_information: str = None
     conference_type: str = None
     contract_award_date: datetime.date = None
     country_publication_code: str = "US"
-    date_added: datetime.datetime = None
-    date_updated: datetime.datetime = None
-    date_submitted_to_osti_first: datetime.datetime = None
-    date_submitted_to_osti_last: datetime.datetime = None
     doe_funded_flag: str = None
     doe_supported_flag: bool = None
     doi: str = None
     doi_infix: str = None
-    edited_by: int = None
     edit_reason: str = None
     geolocations: List[Geolocation] = None
     format_information: str = None
-    hidden_flag: str = None
     invention_disclosure_flag: bool = None
     issue: str = None
     journal_license_url: str = None
@@ -188,7 +180,7 @@ class Record(BaseModel):
     def access_limitation_validation(cls, value)->[]:
         bad_values=[]
         for v in value:
-            if v not in [limitation.name for limitation in cls.AccessLimitation]:
+            if v not in [limitation.name for limitation in AccessLimitation]:
                 bad_values.append(v)
         if bad_values:
             raise ValueError('Unknown Access Limitation value(s): {}'.format(','.join(bad_values)))
@@ -197,7 +189,7 @@ class Record(BaseModel):
     @field_validator("product_type")
     @classmethod
     def product_type_validation(cls, value) -> str:
-        if value not in [type.value for type in cls.ProductType]:
+        if value not in [type.value for type in ProductType]:
             raise ValueError('Unknown product type {}.'.format(value))
         return value
 
@@ -232,3 +224,19 @@ class Record(BaseModel):
     #     """Quick and dirty way to look at Record values - Does not show "None" value fields"""
     #     print("Record:")
     #     print(json.dumps(self.model_dump(exclude_none=True), indent=4, default=str))
+
+class RecordResponse(Record):
+    """
+    Define the parameters of a Record as a response from either query or post/put requests, as 
+    returned by the API.  Includes certain read-only values set administratively by the API.
+    """
+    revision: int = None
+    added_by: int = None
+    edited_by: int = None
+    collection_type: str = None   
+    date_added: datetime.datetime = None
+    date_updated: datetime.datetime = None
+    date_submitted_to_osti_first: datetime.datetime = None
+    date_submitted_to_osti_last: datetime.datetime = None
+    hidden_flag: str = None
+    media: list[MediaInfo] = None

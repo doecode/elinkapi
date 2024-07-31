@@ -1,4 +1,4 @@
-from .record import Record
+from .record import RecordResponse
 from .utils import Validation
 import json
 import requests
@@ -12,7 +12,7 @@ class Query:
     total_rows: int
     next_url: str 
     previous_url: str
-    data: list[Record]
+    data: list[RecordResponse]
     _target: str
     _token: str
     
@@ -22,7 +22,7 @@ class Query:
         
         if(not isinstance(json_records, list)):
             json_records = [json_records]
-        records = [Record(**record) for record in json_records]
+        records = [RecordResponse(**record) for record in json_records]
         
         return records
     

@@ -2,7 +2,7 @@ import requests
 from urllib.parse import urlencode
 import json
 from .exceptions import NotFoundException,ForbiddenException,UnauthorizedException,ServerException,ConflictException,BadRequestException
-from .record import Record
+from .record import Record, RecordResponse
 from .revision import Revision
 from .revision_comparison import RevisionComparison
 from .media_info import MediaInfo
@@ -23,7 +23,7 @@ class Elink:
         
         if(not isinstance(json_records, list)):
             json_records = [json_records]
-        records = [Record(**record) for record in json_records]
+        records = [RecordResponse(**record) for record in json_records]
         
         return records
 
