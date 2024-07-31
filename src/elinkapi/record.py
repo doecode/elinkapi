@@ -181,6 +181,7 @@ class Record(BaseModel):
     persons: List[Person] = None
     organizations: List[Organization] = None
     related_identifiers: List[RelatedIdentifier] = None
+    site_url: str = None
 
     @field_validator("access_limitations")
     @classmethod

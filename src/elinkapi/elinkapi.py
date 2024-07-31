@@ -301,8 +301,9 @@ class Elink:
 
     def post_media(self, osti_id, file_path=None, title=None):
         """Attach the media found at the given filepath to the record associated
-        with the given osti_id. Optionally can provide 2 params: a title for the media file, and, 
-        if not providing a file, a url that leads to the media.
+        with the given osti_id. 
+
+        Optionally may include a "title" query parameter to set a title for the media.
 
         Arguments:
             osti_id -- ID that uniquely identifies an E-link 2.0 Record
@@ -341,7 +342,7 @@ class Elink:
         return self._convert_response_to_media_info(response)
 
     def put_media(self, osti_id, media_id, file_path=None, title=None):
-        """Replace a given media set with a new basis; either a URL or a media file.
+        """Replace a given media set with a new basis file.
         This will replace the previous media set
 
         Arguments:
