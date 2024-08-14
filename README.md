@@ -357,7 +357,7 @@ Params:
 - *media_file_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 ---
 Method:
->  post_media(*osti_id*, *file_path*, *params*=None)
+>  post_media(*osti_id*, *file_path*, *params*=None, *stream*=None)
 
 Returns: MediaInfo
 
@@ -365,10 +365,12 @@ Params:
 - *osti_id* - **int**: ID that uniquely identifies an E-Link 2.0 Record
 - *file_path* - **str**: Path to the media file that will be attached to the Record 
 - *params* - **dict**: "title" that can be associated with the media file
-        "url" that points to media if not sending file (default; {None})
+        "url" that points to media if not sending file (default: {None})
+- *stream* - **bool**: Whether to stream the media file data, which has better performance
+        for larger files (default: {False})
 ---
 Method:
->  put_media(*osti_id*, *media_id*, *file_path*, *params*=None)
+>  put_media(*osti_id*, *media_id*, *file_path*, *params*=None, *stream*=None)
 
 Returns: MediaInfo
 
@@ -377,7 +379,9 @@ Params:
 - *media_id* - **int**: ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 - *file_path* - **str**: Path to the media file that will replace *media_id* Media
 - *params* - **dict**: "title" that can be associated with the media file
-        "url" that points to media if not sending file (default; {None}) 
+        "url" that points to media if not sending file (default: {None}) 
+- *stream* - **bool**: Whether to stream the media file data, which has better performance
+        for larger files (default: {False})
 ---
 Method:
 >  delete_all_media(*osti_id*, *reason*)
