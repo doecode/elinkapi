@@ -479,7 +479,7 @@ class Elink:
                 mp_encoder = MultipartEncoder(
                     fields={'file': (str(osti_id)+'.pdf', response.content, 'application/pdf')}
                 )   
-                response = requests.post(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
                             data=mp_encoder)
                 
@@ -489,7 +489,7 @@ class Elink:
                             fields={'file': (str(osti_id)+'.pdf', f, 'application/pdf' )}
                     )
 
-                    response = requests.post(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                    response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
                             data=m)
         else:
@@ -518,11 +518,11 @@ class Elink:
             if(file_path.startswith("http")):
                 res = requests.get(file_path)
 
-                response = requests.post(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}"},
                             files={'file': res.content})
             else:
-                response = requests.post(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                         headers = { "Authorization" : f"Bearer {self.token}"},
                         files={ 'file': open(file_path, 'rb') })
         else:
