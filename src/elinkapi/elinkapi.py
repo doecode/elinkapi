@@ -1,6 +1,7 @@
 import requests
 from urllib.parse import urlencode
 import json
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 from .exceptions import NotFoundException,ForbiddenException,UnauthorizedException,ServerException,ConflictException,BadRequestException
 from .record import Record, RecordResponse
 from .revision import Revision
@@ -299,7 +300,7 @@ class Elink:
         
         return response.content
 
-    def post_media(self, osti_id, file_path=None, title=None):
+    def post_media(self, osti_id, file_path=None, title=None, stream=False):
         """Attach the media found at the given filepath to the record associated
         with the given osti_id. 
 
@@ -309,8 +310,9 @@ class Elink:
             osti_id -- ID that uniquely identifies an E-link 2.0 Record
 
         Keyword Arguments:
-            title -- optional "title" for media file
             file_path -- filesystem path to upload and  associate with this metadata
+            title -- optional "title" for media file
+            stream -- optional ability to stream the given file, ideal for larger files
             
         Returns:
             MediaInfo 
@@ -328,20 +330,174 @@ class Elink:
 
         if(len(parameters) > 0):
             query_params = "?" + urlencode(parameters)
-
-        # if posting a FILE, send that; if not, send just the PARAMETERS
-        if file_path is not None:
-            response = requests.post(f'{self.target}media/{osti_id}{query_params}',
-                                     headers = { "Authorization" : f"Bearer {self.token}" },
-                                     files={ 'file' : open(file_path, 'rb') })
+        
+        if(stream):
+            response = self.__post_media_stream(osti_id, file_path, query_params)
         else:
-            raise ValueError("File path is missing.")
+            response = self.__post_media_no_stream(osti_id, file_path, query_params)
             
         Validation.handle_response(response)
 
         return self._convert_response_to_media_info(response)
+        
+    def __post_media_stream(self, osti_id, file_path=None, query_params=None):
+        """Attach the media found at the given filepath to the record associated
+        with the given osti_id. 
 
-    def put_media(self, osti_id, media_id, file_path=None, title=None):
+        Arguments:
+            osti_id -- ID that uniquely identifies an E-link 2.0 Record
+
+        Keyword Arguments:
+            file_path -- filesystem path to upload and  associate with this metadata
+            query_params -- optional includes "title" for media file
+            
+        Returns:
+            MediaInfo 
+        """
+
+        # if posting a FILE, send that; if not, send just the PARAMETERS
+        if file_path is not None:
+            if(file_path.startswith("http")):
+                response = requests.get(file_path, stream=True)
+                response.raw.decode_content = True
+                
+                mp_encoder = MultipartEncoder(
+                    fields={'file': (str(osti_id)+'.pdf', response.content, 'application/pdf')}
+                )
+                response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                            headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
+                            data=mp_encoder)
+            else:
+                with open(file_path, 'rb') as f:
+                    m = MultipartEncoder(
+                            fields={'file': (str(osti_id)+'.pdf', f, 'application/pdf' )}
+                    )
+
+                    response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                            headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
+                            data=m)
+        else:
+            raise ValueError("File path is missing.")
+            
+        return response
+
+    def __post_media_no_stream(self, osti_id, file_path=None, query_params=None):
+        """Attach the media found at the given filepath to the record associated
+        with the given osti_id. 
+
+        Optionally may include a "title" query parameter to set a title for the media.
+
+        Arguments:
+            osti_id -- ID that uniquely identifies an E-link 2.0 Record
+
+        Keyword Arguments:
+            file_path -- filesystem path to upload and  associate with this metadata
+            query_params -- optional includes "title" for media file
+            
+        Returns:
+            MediaInfo 
+        """
+
+        # if posting a FILE, send that; if not, send just the PARAMETERS
+        if file_path is not None:
+            if(file_path.startswith("http")):
+                res = requests.get(file_path)
+
+                response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                            headers = { "Authorization" : f"Bearer {self.token}"},
+                            files={'file': res.content})
+            else:
+                response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                        headers = { "Authorization" : f"Bearer {self.token}"},
+                        files={ 'file': open(file_path, 'rb') })
+        else:
+            raise ValueError("File path is missing.")
+            
+        return response
+
+    def put_media(self, osti_id, media_id, file_path=None, title=None, stream=False):
+        """Replace a given media set with a new basis file.
+        This will replace the previous media set. 
+
+        Arguments:
+            osti_id -- ID that uniquely identifies an E-link 2.0 Record
+            media_id -- ID that uniquely identifies a media file associated with an E-Link 2.0 Record
+
+        Keyword Arguments:
+            title -- optional "title" for media file
+            file_path -- filesystem path to upload and  associate with this metadata
+            stream -- optional ability to stream the given file, ideal for larger files
+            
+        Returns:
+            MediaInfo 
+        """
+        query_params = ""
+        parameters = {}
+
+        """ 
+        If optional parameters specified, these must be passed encoded. 
+
+        Title is passed as an optional query parameter
+        """
+        if title is not None:
+            parameters['title'] = title
+
+        if(len(parameters) > 0):
+            query_params = "?" + urlencode(parameters)
+        
+        if(stream):
+            response = self.__put_media_stream(osti_id, media_id, file_path, query_params)
+        else:
+            response = self.__put_media_no_stream(osti_id, media_id, file_path, query_params)
+            
+        Validation.handle_response(response)
+
+        return self._convert_response_to_media_info(response)
+        
+    def __put_media_stream(self, osti_id, media_id, file_path=None, query_params=None):
+        """Replace a given media set with a new basis file.
+        This will replace the previous media set. Intended for larger files
+
+        Arguments:
+            osti_id -- ID that uniquely identifies an E-link 2.0 Record
+            media_id -- ID that uniquely identifies a media file associated with an E-Link 2.0 Record
+
+        Keyword Arguments:
+            file_path -- filesystem path to upload and  associate with this metadata
+            query_params -- optional includes "title" for media file
+            
+        Returns:
+            MediaInfo 
+        """
+
+        # if posting a FILE, send that; if not, send just the PARAMETERS
+        if file_path is not None:
+            if(file_path.startswith("http")):
+                response = requests.get(file_path, stream=True)
+                response.raw.decode_content = True
+                
+                mp_encoder = MultipartEncoder(
+                    fields={'file': (str(osti_id)+'.pdf', response.content, 'application/pdf')}
+                )   
+                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                            headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
+                            data=mp_encoder)
+                
+            else:
+                with open(file_path, 'rb') as f:
+                    m = MultipartEncoder(
+                            fields={'file': (str(osti_id)+'.pdf', f, 'application/pdf' )}
+                    )
+
+                    response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                            headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
+                            data=m)
+        else:
+            raise ValueError("File path is missing.")
+            
+        return response
+
+    def __put_media_no_stream(self, osti_id, media_id, file_path=None, query_params=None):
         """Replace a given media set with a new basis file.
         This will replace the previous media set
 
@@ -349,35 +505,31 @@ class Elink:
             osti_id -- ID that uniquely identifies an E-link 2.0 Record
             media_id -- ID that uniquely identifies a media file associated with an E-Link 2.0 Record
 
-        Optional Arguments:
-            file_path -- Path to the media file that will replace media_id Media
-            title -- Optional title to be associated with this media
-
+        Keyword Arguments:
+            file_path -- filesystem path to upload and  associate with this metadata
+            query_params -- optional includes "title" for media file
+            
         Returns:
-            MediaInfo
+            MediaInfo 
         """
-        query_params = ""
-        parameters = {}
 
-        """
-        As with POST, only accepts "title" optional parameter.
-        """
-        if title is not None:
-            parameters['title'] = title
-
-        if(len(parameters) > 0):
-            query_params = "?" + urlencode(parameters)
-
+        # if putting a FILE, send that; if not, send just the PARAMETERS
         if file_path is not None:
-            response = requests.put(f"{self.target}media/{osti_id}/{media_id}{query_params}", 
-                                headers={ "Authorization" : f"Bearer {self.token}" },
-                                files={'file': open(file_path, 'rb')})
-        else:
-            raise ValueError("No file URL specified to PUT.")
+            if(file_path.startswith("http")):
+                res = requests.get(file_path)
 
-        Validation.handle_response(response)
-        
-        return self._convert_response_to_media_info(response)
+                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                            headers = { "Authorization" : f"Bearer {self.token}"},
+                            files={'file': res.content})
+            else:
+                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                        headers = { "Authorization" : f"Bearer {self.token}"},
+                        files={ 'file': open(file_path, 'rb') })
+        else:
+            raise ValueError("File path is missing.")
+            
+        return response
+
 
     def delete_single_media(self, osti_id, media_id, reason):
         """Disassociate an individual media set from this OSTI ID
