@@ -1,7 +1,8 @@
 from enum import Enum
 from .identifier import Identifier
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from typing import List
+from .utils import Validation
 
 class Organization(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
@@ -35,9 +36,16 @@ class Organization(BaseModel):
         Other="Other"
 
     type:str
-    name:str
+    name:str = None
     contributor_type: str = None
     identifiers: List[Identifier] = None
+    ror_id:str = None
+
+    @model_validator(mode = 'after')
+    def name_or_ror(self):
+        if not self.name and not self.ror_id:
+            raise ValueError("Either name and/or ROR ID value is required.")
+        return self
 
     @field_validator("type")
     @classmethod
@@ -55,6 +63,15 @@ class Organization(BaseModel):
 
     def _add_identifier(self, identifier):
         self.identifiers.append(identifier)
+
+    
+    @field_validator("ror_id")
+    @classmethod
+    def validate_ror_id(cls, value: str) -> str:
+        if value is not None:
+            Validation.find_ror_value(value)
+        return value
+
 
     """
     Add an identifier to this Organization.

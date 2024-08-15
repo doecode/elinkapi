@@ -51,7 +51,7 @@ api = Eink(token='your-token')
 ```python
 from elinkapi import Elink
 
-api = Eink(token='your-token')
+api = Elink(token='your-token')
 ```
 3. The pydantic classes can be fetched using `from elinkapi import Record, Organization`
 4. Exceptions thrown may be accessed using `from elinkapi import exceptions` then reference each as

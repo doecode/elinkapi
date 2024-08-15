@@ -1,4 +1,6 @@
 
+import json
+
 HTTP_STATUS_CODES = {
     200: "OK",
     400: "Bad Request",
@@ -9,6 +11,37 @@ HTTP_STATUS_CODES = {
     500: "Internal Service Error"
 }
 
+class Error():
+    """
+    Detailed error message with source from Exceptions. Mostly used for
+    interpreting BadRequestException cases of validation errors with submissions.
+    """
+    status: int = None
+    detail: str = None
+    source: str = None
+    meta: str = None
+
+    def __init__(self, status: int = None, detail: str = None, source: str = None, meta: str = None):
+        self.status = status
+        self.detail = detail
+        self.source = source
+        self.meta = meta
+
+    def get_status(self) -> int:
+        return self.status
+    def get_detail(self) -> str:
+        return self.detail
+    def get_source(self) -> str:
+        return self.source
+    def get_meta(self) -> str:
+        return self.meta
+    
+    def __repr__(self) -> str:
+        return f'message: {self.detail} source: {self.source}'
+    
+    def __str__(self) -> str:
+        return f'message: {self.detail} source: {self.source}'
+
 # Define some helpfully-named Exceptions for API issues
 class APIException(Exception):
     """ Error or Exception handling a particular request. """
@@ -16,20 +49,40 @@ class APIException(Exception):
     # return/status code for this exception
     status_code: int = 500
     message: str = None
+    errors: list[Error] = []
 
-    def __init__(self, 
-                 message: str = None, 
-                 status_code: int = None)-> None:
-        status_code = status_code or getattr(self.__class__, "status_code", None)
-        if message is None:
-            if self.message:
-                message = self.message
-            elif status_code:
-                message = HTTP_STATUS_CODES.get(status_code, "")
+    def __init__(self,
+                 text: str) -> None:
+        """
+        Attempt to parse the text string for JSON response; if unable,
+        take the message verbatim.
+        """
+        # default a message from the status code if present
+        if text is None and self.status_code:
+            self.message = HTTP_STATUS_CODES.get(status_code, "")
+        else:
+            # try to make a JSON and get details from there
+            try:
+                json_response = json.loads(text)
 
-        super().__init__(message)
-        # set this exception's code
-        self.status_code = status_code or self.status_code
+                # ensure the JSON response contains "errors"; if not, simple bad request
+                if isinstance(json_response, dict) and 'errors' in json_response:
+                    details = []
+
+                    for error in json_response['errors']:
+                        details.append(error['detail'])
+                        self.errors.append(Error(**error))
+                    # message is in the details
+                    self.message = ", ".join(details)
+                else:
+                    # just take the text and go
+                    self.message = text
+            except json.JSONDecodeError as error:
+                # give up and use the response as-is
+                super().__init__(text)
+
+    def get_errors(self) -> list[Error]:
+        return self.errors
 
 class NotFoundException(APIException):
     """ Record not on file. """
@@ -50,24 +103,6 @@ class UnauthorizedException(APIException):
 class BadRequestException(APIException):
     """ Unable to parse the JSON Request made. """
     status_code = 400
-
-class ValidationException(APIException):
-    """Adds validation errors from the response to the exception message"""
-    status_code = 400
-    errors: list = []
-
-    def __init__(self, errors: list = None)->None:
-
-        super().__init__(self._message_from_details(errors))
-        self.errors = errors
-
-    def _message_from_details(self, errors: list) -> str:
-        details = []
-
-        for error in errors:
-            details.append(error['detail'])
-            
-        return ", ".join(details)
         
 class ConflictException(APIException):
     """ The url or file already exists on the server. """

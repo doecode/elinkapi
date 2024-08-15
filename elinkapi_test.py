@@ -31,7 +31,7 @@ valid_submit_json = {
    "phone": "Optional",
    "role": "PRIMARY",
    "affiliations": [
-    "Optional"
+    { "name": "Optional" }
    ]
   },
   {
@@ -55,7 +55,7 @@ valid_submit_json = {
    "phone": "Optional",
    "contributor_type": "Producer",
    "affiliations": [
-    "Optional"
+    { "name": "Optional" }
    ]
   }
  ],
