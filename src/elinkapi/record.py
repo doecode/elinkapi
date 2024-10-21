@@ -83,13 +83,7 @@ class ProductType(Enum):
     SoftwareManual="SM"
     ThesisDissertation="TD"
     TechnicalReport="TR"
-    DataCollection="DC"
-    DataProject="DP"
-    EngineeringDrawing="ED"
-    LegalDocument="LD"
-    NewsStory="NS"
     PatentApplication="PA"
-    SerialPublication="SP"
 
 class Record(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
@@ -234,8 +228,8 @@ class RecordResponse(Record):
     added_by: int = None
     edited_by: int = None
     collection_type: str = None   
-    date_added: datetime.datetime = None
-    date_updated: datetime.datetime = None
+    date_metadata_added: datetime.datetime = None
+    date_metadata_updated: datetime.datetime = None
     date_submitted_to_osti_first: datetime.datetime = None
     date_submitted_to_osti_last: datetime.datetime = None
     hidden_flag: str = None

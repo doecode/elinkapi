@@ -30,3 +30,8 @@
 - added Query support for pagination in response to API query_records endpoint
 - add documentation README for new Query pagination
 - fix various test cases
+
+## 0.3.6 - 09/27/2024
+- change date field names: date_metadata_added, date_metadata_updated for consistency
+- update requirements to include requests-toolbelt properly, and indicate python >=3.9 versioning
+- remove deprecated/legacy product types from Record definition
