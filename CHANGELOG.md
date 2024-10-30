@@ -35,3 +35,4 @@
 - change date field names: date_metadata_added, date_metadata_updated for consistency
 - update requirements to include requests-toolbelt properly, and indicate python >=3.9 versioning
 - remove deprecated/legacy product types from Record definition
+- modified Person requirements to reflect only type and last_name requirements
