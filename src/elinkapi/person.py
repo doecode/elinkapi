@@ -29,7 +29,7 @@ class Person(BaseModel):
         Researcher="Researcher"
         RightsHolder="RightsHolder"
         Supervisor="Supervisor"
-        WorkfPackageLeader="WorkPackageLeader"
+        WorkPackageLeader="WorkPackageLeader"
         Other="Other"
 
     type: str
