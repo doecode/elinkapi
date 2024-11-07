@@ -32,7 +32,7 @@ class Organization(BaseModel):
         RightsHolder="RightsHolder"
         Sponsor="Sponsor"
         Supervisor="Supervisor"
-        WorkfPackageLeader="WorkPackageLeader"
+        WorkPackageLeader="WorkPackageLeader"
         Other="Other"
 
     type:str
