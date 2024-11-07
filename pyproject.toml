@@ -20,7 +20,8 @@ classifiers = [
 dependencies = [
     "requests", 
     "pydantic", 
-    "urllib3"
+    "urllib3",
+    "requests_toolbelt"
 ]
 
 [project.optional-dependencies]
