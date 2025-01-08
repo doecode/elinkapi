@@ -77,6 +77,12 @@ class Organization(BaseModel):
     Add an identifier to this Organization.
     """
     def add(self, item: Identifier):
+        if self.type is not None and self.type != Organization.Type.SPONSOR:
+            raise ValueError ("Only sponsoring organizations may specify identifiers.")
+        
+        if item.type not in [Identifier.Type.AWARD_DOI, Identifier.Type.CONTRACT_NUMBER, Identifier.Type.DOE_CONTRACT_NUMBER]:
+            raise ValueError ("Organization identifier type is not allowed.")
+        
         if self.identifiers is None:
             self.identifiers=[]
         self.identifiers.append(item)

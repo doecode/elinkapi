@@ -16,6 +16,13 @@ class Person(BaseModel):
         BUSINESS_OFFICIAL="SBIZ_BO"
         PRINCIPAL_INVESTIGATOR="SBIZ_PI"
     class Contribution(Enum):
+        Chair="Chair"
+        Reader="Reader"
+        Reviewer="Reviewer"
+        ReviewAssistant="ReviewAssistant"
+        ReviewerExternal="ReviewerExternal"
+        StatsReviewer="StatsReviewer"
+        Translator="Translator"
         DataCollector="DataCollector"
         DataCurator="DataCurator"
         DataManager="DataManager"

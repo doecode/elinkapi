@@ -232,5 +232,5 @@ class RecordResponse(Record):
     date_metadata_updated: datetime.datetime = None
     date_submitted_to_osti_first: datetime.datetime = None
     date_submitted_to_osti_last: datetime.datetime = None
-    hidden_flag: str = None
+    hidden_flag: bool = False
     media: list[MediaInfo] = None

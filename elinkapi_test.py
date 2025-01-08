@@ -29,7 +29,6 @@ valid_submit_json = {
    ],
    "orcid": "0000000155554447",
    "phone": "Optional",
-   "role": "PRIMARY",
    "affiliations": [
     { "name": "Optional" }
    ]

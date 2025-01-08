@@ -36,3 +36,32 @@
 - update requirements to include requests-toolbelt properly, and indicate python >=3.9 versioning
 - remove deprecated/legacy product types from Record definition
 - modified Person requirements to reflect only type and last_name requirements
+
+## 0.3.7 - 11/7/2024
+- maintenance/bugfixes publishing release
+
+## 0.3.8 - 1/8/2025
+- change hidden_flag to boolean
+- adding new relation types for RelatedIdentifier:
+  - BasedOnData
+  - Finances
+  - HasComment
+  - HasDerivation
+  - HasReply
+  - IsBasedOn
+  - IsBasisFor
+  - IsCommentOn
+  - IsDataBasisFor
+  - IsFinancedBy
+  - IsRelatedMaterial
+  - IsReplyTo
+  - IsReviewOf
+- adding new contributor types for Person:
+  - Chair
+  - Reader
+  - Reviewer
+  - ReviewAssistant
+  - ReviewerExternal
+  - StatsReviewer
+  - Translator
+
