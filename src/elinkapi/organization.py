@@ -3,6 +3,7 @@ from .identifier import Identifier
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from typing import List
 from .utils import Validation
+from .contribution import Contribution
 
 class Organization(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
@@ -13,27 +14,6 @@ class Organization(BaseModel):
         RESEARCHING="RESEARCHING"
         SPONSOR="SPONSOR"
         PAMS_TD_INST="PAMS_TD_INST"
-
-    class Contribution(Enum):
-        DataCollector="DataCollector"
-        DataCurator="DataCurator"
-        DataManager="DataManager"
-        Distributor="Distributor"
-        Editor="Editor"
-        HostingInstitution="HostingInstitution"
-        Producer="Producer"
-        ProjectLeader="ProjectLeader"
-        ProjectManager="ProjectManager"
-        ProjectMember="ProjectMember"
-        RegistrationAgency="RegistrationAgency"
-        RegistrationAuthority="RegistrationAuthority"
-        Researcher="Researcher"
-        ResearchGroup="ResearchGroup"
-        RightsHolder="RightsHolder"
-        Sponsor="Sponsor"
-        Supervisor="Supervisor"
-        WorkPackageLeader="WorkPackageLeader"
-        Other="Other"
 
     type:str
     name:str = None
@@ -57,7 +37,7 @@ class Organization(BaseModel):
     @field_validator("contributor_type")
     @classmethod
     def contributor_must_be_valid(cls, value: str) -> str:
-        if value not in [type.value for type in cls.Contribution]:
+        if value not in [type.value for type in Contribution]:
             raise ValueError("Unknown contribution type {}.".format(value))
         return value
 
