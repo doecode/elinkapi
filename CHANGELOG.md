@@ -65,3 +65,5 @@
   - StatsReviewer
   - Translator
 
+## 0.3.9 - 1/17/2025
+- fix issue with Organization identifiers and allowed types
