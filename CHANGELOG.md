@@ -94,3 +94,10 @@
 - adding attributes to Record for released/completed records:
   - date_released
   - sensitivity_flag
+
+## 0.4.1 - 4/3/2025
+- bug fix version
+
+## 0.4.2 - 4/3/2025
+- remove obsolete Identifier references
+- fix issues with allowable types
