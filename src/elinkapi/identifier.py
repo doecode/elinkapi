@@ -6,7 +6,6 @@ class Identifier(BaseModel):
     
     class Type(Enum):
         AUTH_REVISION_NUMBER="AUTH_REV"
-        AWARD_DOI="AWARD_DOI"
         DOE_CONTRACT_NUMBER="CN_DOE"
         CONTRACT_NUMBER="CN_NONDOE"
         CODEN="CODEN"

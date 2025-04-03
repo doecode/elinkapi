@@ -67,3 +67,30 @@
 
 ## 0.3.9 - 1/17/2025
 - fix issue with Organization identifiers and allowed types
+
+## 0.4.0 - 4/3/2025
+- consolidate changes up through E-Link 2 API 2.5.5:
+- adding new relationship types for RelatedIdentifier:
+  - Collects
+  - Compiles
+  - HasExpression
+  - HasFormat
+  - HasManifestation
+  - HasManuscript
+  - HasPreprint
+  - HasRelatedMaterial
+  - IsCollectedBy
+  - IsDerivedFrom
+  - IsDescribedBy (fixed typo)
+  - IsExpressionOf
+  - IsManifestationOf
+  - IsManuscriptOf
+  - IsPreprintOf
+  - IsPublishedIn
+  - IsTranslationOf
+- adding new types of RelatedIdentifier:
+  - CSTR
+  - RRID
+- adding attributes to Record for released/completed records:
+  - date_released
+  - sensitivity_flag
