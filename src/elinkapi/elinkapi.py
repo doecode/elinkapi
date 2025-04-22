@@ -9,6 +9,8 @@ from .revision_comparison import RevisionComparison
 from .media_info import MediaInfo
 from .utils import Validation
 from .query import Query
+import os
+import mimetypes
 
 class Elink:
     def __init__(self, token=None, target=None):
@@ -354,6 +356,8 @@ class Elink:
         Returns:
             MediaInfo 
         """
+        # get a filename component from the path, or make a default
+        filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
 
         # if posting a FILE, send that; if not, send just the PARAMETERS
         if file_path is not None:
@@ -362,7 +366,7 @@ class Elink:
                 response.raw.decode_content = True
                 
                 mp_encoder = MultipartEncoder(
-                    fields={'file': (str(osti_id)+'.pdf', response.content, 'application/pdf')}
+                    fields={'file': (filename, response.content, mimetypes.guess_type(filename)[0])}
                 )
                 response = requests.post(f'{self.target}media/{osti_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
@@ -370,7 +374,7 @@ class Elink:
             else:
                 with open(file_path, 'rb') as f:
                     m = MultipartEncoder(
-                            fields={'file': (str(osti_id)+'.pdf', f, 'application/pdf' )}
+                            fields={'file': (filename, f, mimetypes.guess_type(filename)[0] )}
                     )
 
                     response = requests.post(f'{self.target}media/{osti_id}{query_params}',
@@ -402,10 +406,11 @@ class Elink:
         if file_path is not None:
             if(file_path.startswith("http")):
                 res = requests.get(file_path)
+                filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
 
                 response = requests.post(f'{self.target}media/{osti_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}"},
-                            files={'file': res.content})
+                            files={'file': (filename, res.content, mimetypes.guess_type(filename)[0])})
             else:
                 response = requests.post(f'{self.target}media/{osti_id}{query_params}',
                         headers = { "Authorization" : f"Bearer {self.token}"},
@@ -470,6 +475,9 @@ class Elink:
             MediaInfo 
         """
 
+        # get the base filename or presume one
+        filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
+
         # if posting a FILE, send that; if not, send just the PARAMETERS
         if file_path is not None:
             if(file_path.startswith("http")):
@@ -477,7 +485,7 @@ class Elink:
                 response.raw.decode_content = True
                 
                 mp_encoder = MultipartEncoder(
-                    fields={'file': (str(osti_id)+'.pdf', response.content, 'application/pdf')}
+                    fields={'file': (filename, response.content, mimetypes.guess_type(filename)[0])}
                 )   
                 response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
@@ -486,7 +494,7 @@ class Elink:
             else:
                 with open(file_path, 'rb') as f:
                     m = MultipartEncoder(
-                            fields={'file': (str(osti_id)+'.pdf', f, 'application/pdf' )}
+                            fields={'file': (filename, f, mimetypes.guess_type(filename)[0] )}
                     )
 
                     response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
@@ -517,10 +525,11 @@ class Elink:
         if file_path is not None:
             if(file_path.startswith("http")):
                 res = requests.get(file_path)
+                filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
 
                 response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}"},
-                            files={'file': res.content})
+                            files={'file': (filename, res.content, mimetypes.guess_type(filename)[0]) })
             else:
                 response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                         headers = { "Authorization" : f"Bearer {self.token}"},

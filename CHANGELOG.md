@@ -101,3 +101,6 @@
 ## 0.4.2 - 4/3/2025
 - remove obsolete Identifier references
 - fix issues with allowable types
+
+## 0.4.3 - 4/21/2025
+- support additional media types for media API functions
