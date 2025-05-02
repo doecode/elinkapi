@@ -13,6 +13,7 @@
       - [Seeing Validation Errors on Exception](#seeing-validation-errors-on-exception)
       - [View Revision History](#view-revision-history)
       - [Adding Media to Record](#adding-media-to-record)
+      - [Removing Metadata Records](#removing-record)
       - [Removing Media from a Record](#removing-media-from-a-record)
       - [Compare Two Revision Histories](#compare-two-revision-histories)
       - [Searching and pagination](#searching-and-pagination)
@@ -164,6 +165,18 @@ try:
     saved_media = api.post_media(osti_id, path_to_my_media)
 except Exception as e:
     # Handle the exception as needed
+```
+
+#### Removing Record<a id="removing-record"></a>
+```python
+from elinkapi import Elink
+
+api = Elink(token = "___Your-API-Token___")
+
+try:
+    response = api.delete_record(99999, "Resource no longer available")
+except Exception as e:
+    # Handle any exceptions
 ```
 
 #### Removing Media from a Record<a id="removing-media-from-a-record"></a>

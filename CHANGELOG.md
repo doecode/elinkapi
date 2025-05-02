@@ -104,3 +104,6 @@
 
 ## 0.4.3 - 4/21/2025
 - support additional media types for media API functions
+
+## 0.4.4 - 5/2/2025
+- adding support for individual record DELETE via delete_record()

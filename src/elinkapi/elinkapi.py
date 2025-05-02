@@ -538,6 +538,27 @@ class Elink:
             raise ValueError("File path is missing.")
             
         return response
+    
+    def delete_record(self, osti_id:int, reason:str) -> None:
+        """"
+        Delete a given metadata record from the system by its OSTI ID
+        
+        Arguments:
+            osti_id -- the ID to delete
+            reason -- the stated reason for record deletion for history
+
+        Raises:
+            BadRequestException -- missing required reason value or unable to interpret OSTI ID value
+            ForbiddenException -- user token does not have proper permission to remove record
+            UnauthorizedException -- no user token provided
+            NotFoundException -- record OSTI ID is not on file
+            ServerException -- unknown service error occurred
+        """
+
+        response = requests.delete(f"{self.target}records/{osti_id}?reason={reason}",
+                                   headers = { "Authorization" : f"Bearer {self.token}"})
+        
+        Validation.handle_response(response)
 
 
     def delete_single_media(self, osti_id, media_id, reason):
