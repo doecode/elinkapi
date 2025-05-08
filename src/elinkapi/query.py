@@ -12,6 +12,7 @@ class Query:
     total_rows: int
     next_url: str 
     previous_url: str
+    first_url: str
     data: list[RecordResponse]
     _target: str
     _token: str
@@ -30,11 +31,12 @@ class Query:
         """ load up information from the response object."""
         self.total_rows = int(response.headers['x-total-count'] if 'x-total-count' in response.headers else 0)
         # strip servlet path from these for target link later
+        self.first_url = response.links['first']['url'].replace("/elink2api/", "") if 'first' in response.links else ""
         self.next_url = response.links['next']['url'].replace('/elink2api/', '') if 'next' in response.links else ''
         self.previous_url = response.links['prev']['url'].replace('/elink2api/', '') if 'prev' in response.links else ''
         self.data = self._response_to_records(response)
 
-    def total_count(self):
+    def total_count(self) -> int:
         return self.total_rows
     
     def data(self):
@@ -70,13 +72,37 @@ class Query:
         else:
             raise StopIteration
     
-    def __next__(self):
-        if self.has_next():
-            # get the next set
-            response = requests.get(f"{self._target}{self.next_url}",
+    def reset(self):
+        """
+        Restarts the query object from first page of results if possible.  If no valid first page,
+        raise StopIteration.
+        """
+        if self.first_url:
+            response = requests.get(f"{self.target}{self.first_url}",
                                     headers = { "Authorization" : f"Bearer {self._token}"})
             Validation.handle_response(response)
             self._load(response)
-            return self
         else:
             raise StopIteration
+
+
+    def __next__(self) -> RecordResponse:
+        """
+        Return the next record in this Query, if available.
+        Once this runs out of pages with results, it will raise StopIteration.
+        """
+        try:
+            record = self.data.pop()
+
+            return record
+        except IndexError:
+            # if we have a next page, try that
+            if self.has_next():
+                # get the next set
+                response = requests.get(f"{self._target}{self.next_url}",
+                                        headers = { "Authorization" : f"Bearer {self._token}"})
+                Validation.handle_response(response)
+                self._load(response)
+                return self.__next__()
+            else:
+                raise StopIteration

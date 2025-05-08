@@ -107,3 +107,7 @@
 
 ## 0.4.4 - 5/2/2025
 - adding support for individual record DELETE via delete_record()
+
+## 0.4.5 - 5/8/2025
+- simplified Query interactions to iterate entire recordset
+

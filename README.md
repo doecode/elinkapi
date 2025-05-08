@@ -225,10 +225,12 @@ query = api.query_records(title = "science", product_type = "JA")
 print (f"Query matched {query.total_rows} records")
 
 # paginate through ALL results using iterator
-for page in query:
-    for record in page.data:
-        print (f"OSTI ID: {record.osti_id} Title: {record.title}")
+for record in query:
+    print (f"OSTI ID: {record.osti_id} Title: {record.title}")
 ```
+
+Searches are limited via keywords specified in the query_records method call.  Search term fields and further information is available in 
+the [online API documentation](https://review.osti.gov/elink2api/#operation/getRecords).
 
 ## Method Documentation<a id="method-documentation"></a>
 
@@ -429,14 +431,14 @@ Matches the [Metadata model](https://review.osti.gov/elink2api/#tag/record_model
 
 ### Query<a id="query"></a>
 Produced by API query searches, enables pagination and access to total count of rows matching the query.  Query is iterable, and may
-use Python constructs to paginate all results as desired.
+use Python constructs to paginate all results as desired.  Iterating over the Query returns metadata records individually.
+
+See [Searching and pagination](#searching-and-pagination) for example and more information.
 
 Provides:
 - *total_rows* - **int**: Total count of records matching the query
-- *data* - **list[Record]**: Records on the current page of query results
 - *has_next()* - **boolean**: True if there are more results to be fetched
 - *has_previous()* - **boolean**: True if there is a previous page of results
-
 
 ### Organization<a id="organization"></a>
 Matches the [Organizations model](https://review.osti.gov/elink2api/#tag/organization_model) described in E-Link 2.0's API documentation
