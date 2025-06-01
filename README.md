@@ -43,7 +43,7 @@
     - [ServerException](#server-exception)
 
 ## Introduction<a id="introduction"></a>
-This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation found [here](https://review.osti.gov/elink2api/)) and allows for you to quickly get up and running submitting Records using Python. 
+This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation found [here](https://www.osti.gov/elink2api/)) and allows for you to quickly get up and running submitting Records using Python. 
 
 ## Installation<a id="installation"></a>
 
@@ -64,7 +64,8 @@ This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation fo
 ## Examples<a id="examples"></a>
 
 #### Creating a New Record<a id="creating-a-new-record"></a>
-Note: Ensure site_ownership_code is a value to which your user account token has sufficient access to create records.
+Note: Ensure site_ownership_code is a value to which your user account token has sufficient access to create records.  
+
 ```python
 from elinkapi import Elink, Record, exceptions
 
@@ -230,7 +231,7 @@ for record in query:
 ```
 
 Searches are limited via keywords specified in the query_records method call.  Search term fields and further information is available in 
-the [online API documentation](https://review.osti.gov/elink2api/#operation/getRecords).
+the [online API documentation](https://www.osti.gov/elink2api/#operation/getRecords).
 
 ## Method Documentation<a id="method-documentation"></a>
 
@@ -242,29 +243,32 @@ The following methods may alter parameters on existing Elink instances to alter 
 from elinkapi import Elink
 
 # you may set these directly or alter them later
-# note target defaults to "https://review.osti.gov/elink2api/" for the E-Link 2.0 Beta
-api = Elink(token = 'TOKENVALUE', target='API_ENDPOINT')
+# note target defaults to "https://www.osti.gov/elink2api/" for the E-Link API
+# to access Review or Beta environment, you may specify the target:
+api = Elink(token = 'TOKENVALUE', target="https://review.osti.gov/elink2api/")
 
 # change them
 api.set_api_token("NEWTOKEN")
-api.set_target_url("NEW_API_ENDPOINT")
+# change to PRODUCTION E-Link API
+api.set_target_url("https://www.osti.gov/elink2api/")
 
 ```
+
 Method: 
 > set_api_token(*api_token*)
 
 Returns: None
 
 Params: 
-- *api_token* - **str**: Unique to user API token that can be generated from your E-Link 2.0 Account page
+- *api_token* - **str**: Unique to user API token that can be generated from your [E-Link Account page](https://www.osti.gov/elink/user-account)
 ---
 Method: 
-> set_target_url(*url*="https://review.osti.gov/elink2api"):
+> set_target_url(*url*="https://www.osti.gov/elink2api"):
 
 Returns: None
 
 Params: 
-- *url* - **str**: The url to which all other module methods will direct their requests (default: {"https://review.osti.gov/elink2api"})
+- *url* - **str**: The url to which all other module methods will direct their requests (default: {"https://www.osti.gov/elink2api"})
 ---
 ### Records<a id="records"></a>
 Method:
@@ -286,7 +290,7 @@ api.query_records(title="science")
 Returns: Query object
 
 Params:
-- *params* - **dict**: See [here](https://review.osti.gov/elink2api/#tag/records/operation/getRecords) for 
+- *params* - **dict**: See [here](https://www.osti.gov/elink2api/#tag/records/operation/getRecords) for 
     the list of allowed query parameters.
 
 ---
@@ -427,7 +431,7 @@ from elinkapi import Revision, RevisionComparison
 ```
 
 ### Record<a id="record"></a>
-Matches the [Metadata model](https://review.osti.gov/elink2api/#tag/record_model) described in E-Link 2.0's API documentation
+Matches the [Metadata model](https://www.osti.gov/elink2api/#tag/record_model) described in E-Link 2.0's API documentation
 
 ### Query<a id="query"></a>
 Produced by API query searches, enables pagination and access to total count of rows matching the query.  Query is iterable, and may
@@ -441,16 +445,16 @@ Provides:
 - *has_previous()* - **boolean**: True if there is a previous page of results
 
 ### Organization<a id="organization"></a>
-Matches the [Organizations model](https://review.osti.gov/elink2api/#tag/organization_model) described in E-Link 2.0's API documentation
+Matches the [Organizations model](https://www.osti.gov/elink2api/#tag/organization_model) described in E-Link 2.0's API documentation
 
 ### Person<a id="person"></a>
-Matches the [Persons model](https://review.osti.gov/elink2api/#tag/person_model) described in E-Link 2.0's API documentation
+Matches the [Persons model](https://www.osti.gov/elink2api/#tag/person_model) described in E-Link 2.0's API documentation
 
 ### Identifier<a id="identifier"></a>
-Matches the [Identifiers model](https://review.osti.gov/elink2api/#tag/identifier_model) described in E-Link 2.0's API documentation
+Matches the [Identifiers model](https://www.osti.gov/elink2api/#tag/identifier_model) described in E-Link 2.0's API documentation
 
 ### Related Identifier<a id="related-identifier"></a>
-Matches the [Related Identifiers model](https://review.osti.gov/elink2api/#tag/related_identifier_model) described in E-Link 2.0's API documentation
+Matches the [Related Identifiers model](https://www.osti.gov/elink2api/#tag/related_identifier_model) described in E-Link 2.0's API documentation
 
 ### Geolocation<a id="geolocation"></a>
 <u>Schema</u>

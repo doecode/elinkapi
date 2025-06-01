@@ -18,7 +18,7 @@ class Elink:
         Set up the E-Link 2 OSTI API connector.
         """
         self.token = token
-        self.target = target or "https://review.osti.gov/elink2api/"
+        self.target = target or "https://www.osti.gov/elink2api/"
 
     def _convert_response_to_records(self, response):
         """Returns array of Records"""
@@ -70,9 +70,8 @@ class Elink:
         """Sets the API Token that will be used in each call"""
         self.token = api_token
 
-    def set_target_url(self, url="https://review.osti.gov/elink2api"):
-        """Sets the target URL/environment you will be making requests to.
-        Default= https://review.osti.gov/elink2api"""
+    def set_target_url(self, url="https://www.osti.gov/elink2api/"):
+        """Sets the target URL/environment you will be making requests to."""
         self.target = url
 
     def record_to_dict(self, record):
@@ -102,7 +101,7 @@ class Elink:
         """Query for records using a variety of query params
 
         Arguments:
-            params -- See https://review.osti.gov/elink2api/#tag/records/operation/getRecords for 
+            params -- See https://www.osti.gov/elink2api/#tag/records/operation/getRecords for 
                 the list of allowed query parameters. 
 
         Returns:
