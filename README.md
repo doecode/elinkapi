@@ -65,7 +65,7 @@ This module is setup to mimic the E-Link 2.0 API Endpoints (API documentation fo
 
 ## Examples<a id="examples"></a>
 
-#### Using the API connection<a id="using-api-connection"></a>
+#### Using the API connection<a id="using-the-api-connection"></a>
 In order to use the python API library, it is generally required to create an instance of the "API object" to interact with.  Following examples will
 start out with this, but more details will be provided in this section.
 
