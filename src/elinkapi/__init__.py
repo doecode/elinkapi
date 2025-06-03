@@ -7,6 +7,7 @@ from elinkapi.geolocation import Geolocation
 from elinkapi.identifier import Identifier
 from elinkapi.organization import Organization
 from elinkapi.record import Record
+from elinkapi.auditlogs import AuditLog
 from elinkapi.record import AccessLimitation, JournalType, ProductType, PAMSPatentStatus, PAMSProductSubType, PAMSPublicationStatus
 from elinkapi.media_file import MediaFile
 from elinkapi.media_info import MediaInfo
@@ -48,6 +49,7 @@ __all__ = (
     "Revision",
     "RevisionComparison",
     "Query",
+    "AuditLog",
     # enumerations
     "AccessLimitation",
     "JournalType",

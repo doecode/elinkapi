@@ -111,3 +111,10 @@
 ## 0.4.5 - 5/8/2025
 - simplified Query interactions to iterate entire recordset
 
+## 0.4.6 - 5/31/2025
+- production URL default (https://www.osti.gov/elink2api/ target)
+- update documentation to new production URLs for E-Link release
+
+## 0.4.7 - 6/4/2025
+- Adding support for AuditLog information for workflow status transitions
+- improve documentation examples, add notes for two environments

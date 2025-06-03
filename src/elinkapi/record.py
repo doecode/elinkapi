@@ -5,6 +5,7 @@ from .person import Person
 from .related_identifier import RelatedIdentifier
 from .organization import Organization
 from .geolocation import Geolocation
+from .auditlogs import AuditLog
 from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List
 import datetime
@@ -171,14 +172,14 @@ class Record(BaseModel):
 
     @field_validator("access_limitations")
     @classmethod
-    def access_limitation_validation(cls, value)->[]:
+    def access_limitation_validation(cls, value)->List[str]:
         bad_values=[]
         for v in value:
             if v not in [limitation.name for limitation in AccessLimitation]:
                 bad_values.append(v)
         if bad_values:
             raise ValueError('Unknown Access Limitation value(s): {}'.format(','.join(bad_values)))
-        return value
+        return bad_values
     
     @field_validator("product_type")
     @classmethod
@@ -236,3 +237,4 @@ class RecordResponse(Record):
     sensitivity_flag: str = None
     hidden_flag: bool = False
     media: list[MediaInfo] = None
+    audit_logs: list[AuditLog] = None
