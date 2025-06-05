@@ -118,3 +118,7 @@
 ## 0.4.7 - 6/4/2025
 - Adding support for AuditLog information for workflow status transitions
 - improve documentation examples, add notes for two environments
+
+## 0.4.8 - 6/5/2025
+- **bug** Fix issue with access limitation validation on new records
+- **bug** Fix typing of pams_publication_status field

@@ -125,9 +125,10 @@ class Record(BaseModel):
     opn_fieldoffice_acronym_code: str = None
     other_information: List[str] = None
     ouo_release_date: datetime.date = None
-    pams_publication_status: int = None
+    pams_publication_status: str = None
     pams_publication_status_other: str = None
     pams_authors: str = None
+    pams_editors: str = None
     pams_product_sub_type: int = None
     pams_patent_country_code: str = None
     pams_transnational_patent_office: str = None
@@ -179,7 +180,7 @@ class Record(BaseModel):
                 bad_values.append(v)
         if bad_values:
             raise ValueError('Unknown Access Limitation value(s): {}'.format(','.join(bad_values)))
-        return bad_values
+        return value
     
     @field_validator("product_type")
     @classmethod
