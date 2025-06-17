@@ -5,9 +5,21 @@ from .affiliation import Affiliation
 from .contribution import Contribution
 
 class Person(BaseModel):
+    """
+    Class representing a particular Person involved in production, maintenance, or distribution of this
+    product.  This includes authors, contributors, contact information, releasing official, and others.
+
+    Each Person has a defined Type (see Person.Type enumeration) to indicate the primary relation of this
+    person to the record.  For CONTRIBUTING type, it is expected the contributor_type to detail the type of
+    contribution this person provided, defined by contribution.Contribution enumeration.
+    """
     model_config = ConfigDict(validate_assignment=True)
 
     class Type(Enum):
+        """
+        Defines the primary "type" of this Person in relation to the record or product.  For CONTRIBUTING
+        persons, the contributor_type is also expected.
+        """
         AUTHOR="AUTHOR"
         CONTRIBUTING="CONTRIBUTING"
         CONTACT="CONTACT"
@@ -42,14 +54,17 @@ class Person(BaseModel):
         return value
     
     def add_email(self, address: str):
+        """
+        Add a contact email to this person.
+        """
         if self.email is None:
             self.email = []
         self.email.append(address)
 
-    """
-    Add an affiliation to this Person.
-    """
     def add_affiliation(self, affiliation: Affiliation):
+        """
+        Add an affiliation to this Person.
+        """
         if self.affiliations is None:
             self.affiliations = []
         self.affiliations.append(affiliation)

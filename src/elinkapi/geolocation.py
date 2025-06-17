@@ -3,14 +3,28 @@ from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List
 
 class Geolocation(BaseModel):
+    """
+    Defines a particular geolocation point or area related to the associated record or product.  It is made up of a
+    List of Point values (latitude, longitude pairs) making up the geolocation construct.
+    """
     model_config = ConfigDict(validate_assignment=True)
 
     class Type(Enum):
+        """
+        Indicates the TYPE of this particular geolocation construct.
+        A POINT is a single set of latitude and longitude.
+        A BOX indicates a NW and SE pair of latitude and longitude points making up the box area.
+        A POLYGON should be any number of latitude and longitude pairs, starting and ending with the same value to complete
+        the polygon construct.
+        """
         POINT="Point"
         BOX="BOX"
         POLYGON="POLYGON"
 
     class Point(BaseModel):
+        """
+        Represents a single POINT, or pair of latitude and longitude values, that makes up part of the geolocation.
+        """
         model_config = ConfigDict(validate_assignment=True)
 
         latitude: float

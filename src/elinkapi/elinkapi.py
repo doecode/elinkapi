@@ -13,6 +13,24 @@ import os
 import mimetypes
 
 class Elink:
+    """
+    Defines a set of access points for E-Link API endpoints.
+
+    Construct an api access object, defining the desired API target and supplying the user-specific API key token.
+
+    Use this to access functions, including:
+
+    get_single_record -- obtain a particular Record by its OSTI ID
+    query_records -- query E-Link records according to given parameters
+    post_new_record -- create a new Record; returned with unique OSTI ID value
+    update_record -- update the indicated record content by OSTI ID
+    patch_record -- submit a partial JSON update to a given record by its OSTI ID
+    patch_json -- submit a JSON-patch set of commands to update a given record by its OSTI ID
+    get_media -- obtain all media sets associated with an OSTI ID
+    post_media -- add a new media set to the OSTI ID
+    put_media -- replace an existing media set with new content
+
+    """
     def __init__(self, token=None, target=None):
         """
         Set up the E-Link 2 OSTI API connector.
@@ -105,7 +123,8 @@ class Elink:
                 the list of allowed query parameters. 
 
         Returns:
-            List[Record] - A list of one or more matching metadata records, if found. 
+            a iterative Query object containing total_rows count matching the search, and data containing
+            a page at a time of returned Record values as a List.
         """
         query_params = ""
 
@@ -162,6 +181,55 @@ class Elink:
 
         # returns array, so grab the first element
         return self._convert_response_to_records(response)[0] 
+    
+    def patch_record(self, osti_id, patch, state="save"):
+        """
+        Update record via partial-patch-json method endpoint
+
+        Arguments:
+            osti_id -- the OSTI ID of the record to patch
+            patch -- JSON/dict containing the partial JSON to apply
+
+        Keyword arguments:
+            state -- the desired workflow submission state ("save" or "submit") default: "save"
+
+        Returns:
+            Record -- the metadata of the new record revision if successful
+        """
+        response = requests.patch(f"{self.target}/records/{osti_id}/{state}",
+                        headers = { 
+                            "Authorization" : f"Bearer {self.token}",
+                            "Content-Type": "application/json"
+                        },
+                        data=str(patch))
+        
+        Validation.handle_response(response)
+
+        return self._convert_response_to_records(response)[0]
+    
+    def patch_json(self, osti_id, jsonpatch, state="save"):
+        """
+        Update record via a JSON-patch set of command operations.
+        
+        :param osti_id: The OSTI ID of the record to patch
+        :type osti_id: int
+
+        :param jsonpatch: The JSON or dict containing array of patch operations to perform
+        :param state: The desired workflow state of the new revision ("save" or "submit") default: "save"
+
+        :return: a Record of the new revision if successful
+
+        """
+        response = requests.patch(f"{self.target}/records/{osti_id}/{state}",
+                                  headers = {
+                                      "Authorization" : f"Bearer {self.token}",
+                                      "Content-Type": "application/json-patch+json"
+                                  },
+                                  data=str(jsonpatch))
+        
+        Validation.handle_response(response)
+
+        return self._convert_response_to_records(response)[0]
 
     def update_record(self, osti_id, record, state="save"):
         """Update existing records at OSTI by unique OSTI ID

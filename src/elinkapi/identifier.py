@@ -2,9 +2,17 @@ from enum import Enum
 from pydantic import BaseModel, ConfigDict, field_validator
 
 class Identifier(BaseModel):
+    """
+    Different types of identifying numbers, including DOE contract numbers, report numbers, ISSN, ISBN, or other identifying numbers
+    associated with the product or record.  Each element requires a "type" (enumerated by an Identifier.Type value) and the
+    "value" of the identifier.
+    """
     model_config = ConfigDict(validate_assignment=True)
     
     class Type(Enum):
+        """
+        Indicates the particular TYPE of this identifier.
+        """
         AUTH_REVISION_NUMBER="AUTH_REV"
         AWARD_DOI="AWARD_DOI"
         DOE_CONTRACT_NUMBER="CN_DOE"

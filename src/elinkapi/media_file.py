@@ -4,6 +4,25 @@ from enum import Enum
 import datetime
 
 class MediaFile(BaseModel):
+    """
+    Represents a particular full text file or URL associated with a 
+    MediaSet.
+
+    Each media file or URL is uniquely identified by its media_file_id
+    value.  The url_type indicates whether it is "L" (local to OSTI) or
+    "O" (offsite URL reference).  The "url" indicates the file pathname or
+    offsite URL value of this MediaFile record.  
+
+    Many of the other fields are administrative, and supplied during
+    media processing by the backend workers, as applicable to the
+    media file type.
+
+    Any issues or failures during processing are usually detailed by the
+    processing_exceptions value.  The "status" is generally "DONE" for
+    those that have completed processing successfully, but may be "OCR"
+    indicating awaiting background OCR processing, or "FAIL" if the
+    media file failed processing in some way.
+    """
     model_config = ConfigDict(validate_assignment=True)
 
     class UrlType(Enum):
@@ -15,6 +34,7 @@ class MediaFile(BaseModel):
     revision: int = None
     parent_media_file_id: int = None
     status: str = None
+    processing_exceptions: str = None
     media_type: str = None
     url_type: str = None
     url: str = None

@@ -6,6 +6,9 @@ class RelatedIdentifier(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
     class Type(Enum):
+        """
+        Enumeration of each possible "type" of related identifier.
+        """
         URL="URL"
         URN="URN"
         UPC="UPC"
@@ -27,6 +30,10 @@ class RelatedIdentifier(BaseModel):
         CSTR="CSTR"
         RRID="RRID"
     class Relation(Enum):
+        """
+        Indicates the relationship of this related identifier to the
+        record or product to which it is associated.
+        """
         BasedOnData="BasedOnData"
         Cites="Cites"
         Collects="Collects"

@@ -8,6 +8,16 @@ class Query:
     Search/query object.  Contains total count of records found,
     the data (List of Record objects), and links to next and/or previous
     pages as applicable.
+
+    Query is iterative, so may use "data" element a page at a time, or
+    freely iterate until all rows are obtained, as the Query will automatically
+    handle pagination forward.
+
+    .. code-block:: python
+        query = api.query_records(title='Science report', product_type = 'TR')
+        
+        for record in query:
+            print (record.model_dump_json(exclude_none=True))
     """
     total_rows: int
     next_url: str 

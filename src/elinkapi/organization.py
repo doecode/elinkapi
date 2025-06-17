@@ -6,9 +6,21 @@ from .utils import Validation
 from .contribution import Contribution
 
 class Organization(BaseModel):
+    """
+    Represents an Organzation related to the associated record or product.  The "type" indicates the association of the organization
+    to the metadata; one of AUTHOR, CONTRIBUTING, RESEARCHING, SPONSOR, etc. as defined in Organization.Type enumeration, and a "name"
+    and/or "ror_id" value for this Organization.
+
+    CONTRIBUTING Organizations should additionally supply a contributor_type value, as indicated by the contribution.Contribution
+    enumeration values.  Additionally SPONSOR Organizations may have one or more Identifier values associated, usually one or more contract
+    numbers (DOE or non-DOE).  See Identifier class for details on these values.  Only SPONSOR Organizations may have these values.
+    """
     model_config = ConfigDict(validate_assignment=True)
 
     class Type(Enum):
+        """
+        Defines the TYPE of this Organization.
+        """
         AUTHOR="AUTHOR"
         CONTRIBUTING="CONTRIBUTING"
         RESEARCHING="RESEARCHING"
@@ -52,11 +64,10 @@ class Organization(BaseModel):
             Validation.find_ror_value(value)
         return value
 
-
-    """
-    Add an identifier to this Organization.
-    """
     def add(self, item: Identifier):
+        """
+        Add an identifier to this Organization.
+        """
         if self.type is not None and self.type != Organization.Type.SPONSOR.value:
             raise ValueError ("Only sponsoring organizations may specify identifiers.")
         

@@ -1,6 +1,11 @@
 from enum import Enum
 
 class Contribution(Enum):
+    """
+    Defines the type of contribution for each CONTRIBUTING Person or Organization involved in the
+    associated Record or product.  Definitions of these types are available on the E-Link online
+    API documentation at https://www.osti.gov/elink2api/#tag/person_model 
+    """
     Chair="Chair"
     ContactPerson="ContactPerson"
     DataCollector="DataCollector"

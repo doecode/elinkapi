@@ -122,3 +122,11 @@
 ## 0.4.8 - 6/5/2025
 - **bug** Fix issue with access limitation validation on new records
 - **bug** Fix typing of pams_publication_status field
+
+## 0.4.9 - 6/17/2025
+- Add legacy access limitation values for validation
+- Modify PAMS publication status constants to reflect proper values (int to str)
+- Add "process_exceptions" to MediaFile data
+- Update to requests dependency (>=2.32.4) to address potential vulnerability
+- Support patch methods to update metadata through new endpoints
+- Added documentation and explanations to a number of library functions

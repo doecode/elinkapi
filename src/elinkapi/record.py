@@ -11,6 +11,20 @@ from typing import List
 import datetime
 
 class AccessLimitation(Enum):
+    """
+    Access limitations, or distribution limitations, describe the intended audience
+    or any restrictions to be placed upon the distribution of this product's metadata
+    and/or related full text.  This may range from UNL (Unlimited), being essentially
+    no restriction, to various levels of limited audience notations as desired.
+
+    Note that many combinations are disallowed as conflicting; UNL may not be 
+    combined with most others, for example, while OUO is often combined with various
+    other levels (e.g., PROT, SSI, etc.)
+
+    Some values are intended for legacy or historical records only, as indicated in 
+    the descriptions (AT, ILLIM, etc.)
+    """
+    AT="Applied Technology (legacy)"
     UNL="Unlimited"
     OPN="Opennet"
     CPY="Copyright"
@@ -24,8 +38,19 @@ class AccessLimitation(Enum):
     PDOUO="Program-determined OUO"
     NNPI="Naval Navication Propulsion Information"
     INTL="International Data"
+    ILLIM="International (legacy)"
+    ILUSO="International (legacy)"
+    OTHR="Other/unknown (legacy)"
+    PDSH="Program Directed Sensitive (legacy)"
+    PROP="Protected (legacy)"
+    SBIR="SBIR"
+    STTR="STTR"
 
 class JournalType(Enum):
+    """"
+    Describes the particular type of this journal publication, and is only applicable to 
+    ProductType JA.
+    """
     Manuscript="FT"
     DOEAcceptedManuscript="AM"
     DOEAcceptedManuscriptNoDOI="AW"
@@ -33,12 +58,16 @@ class JournalType(Enum):
     PublishedAcceptedManuscript="PM"
 
 class PAMSPublicationStatus(Enum):
-    Published=1
-    AwaitingPublication=2
-    Accepted=3
-    UnderReview=4
-    Submitted=5
-    Other=0
+    Published="PUBLISHED"
+    Other="OTHER"
+    Submitted="SUBMITTED"
+    UnderReview="UNDER_REVIEW"
+    Accepted="ACCEPTED"
+    AwaitingPublication="AWAITING_PUBLICATION"
+    Pending="PENDING"
+    Granted="GRANTED"
+    Licensed="LICENSED"
+    NONE="NONE"
 
 class PAMSPatentStatus(Enum):
     Submitted=1
@@ -71,6 +100,10 @@ class PAMSProductSubType(Enum):
     TechnologyTechnique=23
 
 class ProductType(Enum):
+    """
+    Indicates the type of product represented by this record.  Each product type may require or disallow certain fields; for example,
+    JA requires a number of "journal-related" fields, while most other types disallow information in these fields.
+    """
     AccomplishmentReport="AR"
     Book="B"
     Conference="CO"
@@ -87,6 +120,23 @@ class ProductType(Enum):
     PatentApplication="PA"
 
 class Record(BaseModel):
+    """
+    Describes a particular record or product (e.g., dataset, technical report, journal article, etc.) with all
+    associated bibliographic metadata information.
+
+    Each record has a unique identifier in osti_id; for new records, this will be returned upon successful submission.
+    Subsequent revisions to the record should supply this value to uniquely identify the record.  Many fields may also detail
+    various administrative fields (various dates and workflow states during processing).
+
+    Record construction will default certain fields, as well as indicate which are required at a mimimum (in this case, 
+    product_type and title are required.)  The following are one-to-many child components and classes of their own:
+
+    - persons (Person)
+    - organizations (Organization)
+    - geolocations (Geolocation)
+    - identifiers (Identifier)
+    - related_identifiers (RelatedIdentifier)
+    """
     model_config = ConfigDict(validate_assignment=True)
 
     osti_id: int = None
@@ -189,10 +239,10 @@ class Record(BaseModel):
             raise ValueError('Unknown product type {}.'.format(value))
         return value
 
-    """
-    Add an Identifier, Person, Organization, Geolocation, or RelatedIdentifier to this Record.
-    """
     def add(self, item):
+        """
+        Add an Identifier, Person, Organization, Geolocation, or RelatedIdentifier to this Record.
+        """
         if isinstance(item, Identifier):
             if self.identifiers is None:
                 self.identifiers = []
