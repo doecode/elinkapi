@@ -26,11 +26,11 @@ class Validation:
 
         Raises:
             UnauthorizedException: API token not provided with request
-            ForbiddenException: User is not allowed to access
+            ForbiddenException: User is not allowed to access resource, or user authorization failure
             NotFoundException: Requested object could not be found
-            ConflictException: Resource already exists
+            ConflictException: Resource already exists, usually duplicate media submission
             BadRequestException: Issue with the submitted json, see error message for details
-            ServerException: Unknown error
+            ServerException: Unknown error, for backend service failure
 
         Returns:
             Either the successful response or the appropriate exception is raised
@@ -38,13 +38,13 @@ class Validation:
         if response.status_code in [200, 201, 204]:
             return response
         elif response.status_code == 400:
-            raise BadRequestException(response.text)
+            raise BadRequestException(response.text if response.text else 'Bad request or validation error.')
         elif response.status_code == 401:
             raise UnauthorizedException('No user account information supplied.')
         elif response.status_code == 403:
-            raise ForbiddenException(response.text)
+            raise ForbiddenException(response.text if response.text else 'Access denied.')
         elif response.status_code == 404:
-            raise NotFoundException(response.text)
+            raise NotFoundException(response.text if response.text else 'Resource not on file.')
         elif response.status_code == 409:
             raise ConflictException("Conflict, URL or file is already associated with this record.")
         else: # 500
