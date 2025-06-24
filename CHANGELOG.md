@@ -123,7 +123,7 @@
 - **bug** Fix issue with access limitation validation on new records
 - **bug** Fix typing of pams_publication_status field
 
-## 0.4.9 - 6/17/2025
+## 0.4.9 - 6/24/2025
 - Add legacy access limitation values for validation
 - Modify PAMS publication status constants to reflect proper values (int to str)
 - Add "process_exceptions" to MediaFile data
