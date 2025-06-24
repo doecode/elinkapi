@@ -88,7 +88,7 @@ class Query:
         raise StopIteration.
         """
         if self.first_url:
-            response = requests.get(f"{self.target}{self.first_url}",
+            response = requests.get(f"{self._target}{self.first_url}",
                                     headers = { "Authorization" : f"Bearer {self._token}"})
             Validation.handle_response(response)
             self._load(response)

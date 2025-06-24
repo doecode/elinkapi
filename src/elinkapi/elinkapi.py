@@ -17,6 +17,15 @@ class Elink:
     Defines a set of access points for E-Link API endpoints.
 
     Construct an api access object, defining the desired API target and supplying the user-specific API key token.
+    Note that Review and Production are entirely separate instances, with Production being the default target if not
+    specified.
+
+    These endpoint targets are:
+    review: https://review.osti.gov/elink2api/
+    production: https://www.osti.gov/elink2api/
+
+    >>> from elinkapi import Elink
+    >>> api = Elink(target = "https://review.osti.gov/elink2api/", token=MYUSERTOKEN)
 
     Use this to access functions, including:
 
@@ -29,6 +38,23 @@ class Elink:
     get_media -- obtain all media sets associated with an OSTI ID
     post_media -- add a new media set to the OSTI ID
     put_media -- replace an existing media set with new content
+
+    Record creation methods (reserve_doi, post_new_record, update_record) may provide a user-supplied Record, a dict 
+    containing required key elements, or as keyword arguments.
+    >>> api.post_new_record(title="My dataset", product_type="DA")
+    or
+    >>> api.post_new_record({ "title": "New Technical Report", "product_type" : "TR" })
+    or
+    >>> api.post_new_record(Record(title="Example journal", product_type="JA", journal_name="Science", doi="10.11578/23423"))
+
+    Record instances contain a reference function dict() to obtain a dictionary from its content.  Supply optional
+    "exclude_none=True" argument to obtain only elements with values if desired:
+    >>> myrecord.dict(exclude_none=True)
+
+    Individual values in Record instances are directly accessible and may be set in the same way; e.g., 
+    >>> myrecord.title = "New Title Here"
+    or
+    >>> print (myrecord.doi)
 
     """
     def __init__(self, token=None, target=None):
@@ -100,7 +126,10 @@ class Elink:
 
     # Record Methods
     def get_single_record(self, osti_id: int):
-        """Obtain the metadata JSON for a record at OSTI
+        """Obtain the metadata JSON for a record at OSTI.
+
+        >>> record = api.get_single_record(2009785)
+        >>> print (record.title)
 
         Arguments:
             osti_id -- ID that uniquely identifies an E-link 2.0 Record
@@ -116,7 +145,14 @@ class Elink:
         return self._convert_response_to_records(response)[0]
 
     def query_records(self, **kwargs):
-        """Query for records using a variety of query params
+        """Query for records using a variety of query search parameters.
+
+        Example:
+        >>> query = api.query_records(title="Science", product_type = "JA")
+        >>> query.total_rows
+        1738
+        >>> for record in query:
+        ...   print (record.title)
 
         Arguments:
             params -- See https://www.osti.gov/elink2api/#tag/records/operation/getRecords for 
@@ -138,38 +174,72 @@ class Elink:
 
         return Query(response, target=self.target, token=self.token)
 
-    def reserve_doi(self, record):
-        """ Save a Record with minimal validations: 
-            Required:
+    def reserve_doi(self, r=None, **kwargs):
+        """ Save a Record with minimal validations. 
+
+            Required data elements, either via a Record or keyword arguments:
                 title
                 site_ownership_code
                 product_type
 
+            Provided as a convenience; functionally equivalent to post_new_record method, with
+            state="save".
+
+            >>> reservation = api.reserve_doi(title="Sample dataset from 2012", product_type = "DA")
+            >>> print (reservation.doi)
+            '10.11578/2003824'
+
         Arguments:
-            record -- Metadata record that you wish to save to E-Link 2.0
+            record -- Metadata record that you wish to save to E-Link 2.0 (optional)
+
+        Keyword Arguments:
+            if record is not provided, these will be used to construct a new one for DOI reservation.
 
         Returns:
             Record - metadata of a single record that has been saved to E-Link 2.0
         """
-        response = requests.post(self.target+ "records/save", headers={"Authorization": f"Bearer {self.token}"}, 
-                                 json=json.loads(record.model_dump_json(exclude_none=True)))
+        # perform a minimal new record POST
+        return self.post_new_record(r=r, **kwargs)
+    
+    def _convert_record(self, record=None, **kwargs) -> Record:
+        """
+        Accept either a Record or a dict, which we convert to a Record for consistency. Will
+        take appropriately-named keyword arguments if record is not provided to construct one.
 
-        Validation.handle_response(response)
+        Arguments:
+            record -- either a dict to convert, or already a Record (optional)
+
+        Keyword arguments:
+            if record not provided, use these to construct one
+
+        Returns:
+            a Record, possibly from the dict if possible.
         
-        return self._convert_response_to_records(response)[0]
+        """
+        if record and isinstance(record, dict):
+            return Record(**record)
+        elif record and isinstance(record, Record):
+            return record
+        else:
+            return Record(**kwargs)
 
-    def post_new_record(self, record, state="save"):
+    def post_new_record(self, r=None, state="save", **kwargs):
         """Create a new metadata Record with OSTI
 
         Arguments:
-            record -- Metadata record that you wish to send ("save" or "submit") to E-Link 2.0
+            record -- Metadata record that you wish to send ("save" or "submit") to E-Link 2.0. May provide as 
+                      Record or dict, or as keyword arguments.
 
         Keyword Arguments:
             state -- The desired submission state of the record ("save" or "submit")  (default: {"save"})
+            if record not provided, takes rest of keyword arguments to construct a Record
 
         Returns:
             Record - metadata of a single record saved (or submitted) to E-Link 2.0
         """
+        # make a Record from provided arguments
+        record = self._convert_record(record=r, **kwargs)
+        # post it as a new record
         response = requests.post(f"{self.target}records/{state}", 
                                  headers={
                                      "Authorization": f"Bearer {self.token}", 
@@ -184,7 +254,9 @@ class Elink:
     
     def patch_record(self, osti_id, patch, state="save"):
         """
-        Update record via partial-patch-json method endpoint
+        Update record via partial-patch-json method endpoint.  Provide only the JSON you wish to alter.
+
+        >>> api.patch_record(2008590, { "title": "This title is new", "description": "As is this description" })
 
         Arguments:
             osti_id -- the OSTI ID of the record to patch
@@ -209,41 +281,52 @@ class Elink:
     
     def patch_json(self, osti_id, jsonpatch, state="save"):
         """
-        Update record via a JSON-patch set of command operations.
+        Update record via a JSON-patch set of command operations.  Note the jsonpatch is intended to be
+        an array of one or more operations to perform; those including "add", "replace", "copy", "move", or
+        "remove".  See details at https://www.osti.gov/elink2api/#operation/patchRecord.
+
+        >>> api.patch_json(2007439, [{"op": "add", "path": "/description", "value": "A new description."}])
         
-        :param osti_id: The OSTI ID of the record to patch
-        :type osti_id: int
+        Arguments:
+            osti_id -- The OSTI ID of the record to patch
+            jsonpatch -- JSON or dict containing any operations to perform on the record
 
-        :param jsonpatch: The JSON or dict containing array of patch operations to perform
-        :param state: The desired workflow state of the new revision ("save" or "submit") default: "save"
+        Keyword arguments:
+            state -- Desired workflow state of the new revision ("save" or "submit") default: "save"
 
-        :return: a Record of the new revision if successful
-
+        Returns:
+            Record -- the metadata of the new revision with operations performed if successful
         """
         response = requests.patch(f"{self.target}/records/{osti_id}/{state}",
                                   headers = {
                                       "Authorization" : f"Bearer {self.token}",
                                       "Content-Type": "application/json-patch+json"
                                   },
-                                  data=str(jsonpatch))
+                                  data=json.dumps(jsonpatch))
         
         Validation.handle_response(response)
 
         return self._convert_response_to_records(response)[0]
 
-    def update_record(self, osti_id, record, state="save"):
-        """Update existing records at OSTI by unique OSTI ID
+    def update_record(self, osti_id, r=None, state="save", **kwargs):
+        """Update existing records at OSTI by unique OSTI ID.  Note this REPLACES the record entirely;
+        the provided record details will become the new revision of the record on file; all required
+        information must therefore be provided as applicable.
 
         Arguments:
             osti_id -- ID that uniquely identifies an E-link 2.0 Record
-            record -- Metadata record that you wish to make the new revision of OSTI ID
+            record -- Metadata record that you wish to make the new revision of OSTI ID (optional, as Record or dict)
 
         Keyword Arguments:
             state -- The desired submission state of the record ("save" or "submit")  (default: {"save"})
+            if record not specified, rest of the keyword arguments are used to construct one
 
         Returns:
             Record - Metadata of record updated with the given information, creating a new revision
         """
+        # get a record
+        record = self._convert_record(record=r, **kwargs)
+        # send the UPDATE
         response = requests.put(f"{self.target}records/{osti_id}/{state}", 
                                 headers={
                                     "Authorization": f"Bearer {self.token}"
@@ -489,7 +572,8 @@ class Elink:
 
     def put_media(self, osti_id, media_id, file_path=None, title=None, stream=False):
         """Replace a given media set with a new basis file.
-        This will replace the previous media set. 
+        This will replace the previous media set. Both osti_id and media_id (of the set to replace) 
+        are required.
 
         Arguments:
             osti_id -- ID that uniquely identifies an E-link 2.0 Record

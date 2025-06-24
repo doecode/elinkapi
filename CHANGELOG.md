@@ -130,3 +130,4 @@
 - Update to requests dependency (>=2.32.4) to address potential vulnerability
 - Support patch methods to update metadata through new endpoints
 - Added documentation and explanations to a number of library functions
+- Accept dict or keyword arguments for Record argument methods
