@@ -36,6 +36,14 @@
     - [Media File](#media-file)
     - [Revision](#revision)
     - [Revision Comparison](#revision-comparison)
+  - [Enumerations](#enumerations)
+    - [AccessLimtation](#access-limitation)
+    - [JournalType](#journal-type)
+    - [ProductType](#product-type)
+    - [PAMSPatentStatus](#pams-patent-status)
+    - [PAMSProductSubType](#pams-product-subtype)
+    - [PAMSPublicationStatus](#pams-publication-status)
+    - [WorkflowStatus](#workflow-status)
   - [Exceptions](#exceptions)
     - [UnauthorizedException](#unauthorized-exception)
     - [ForbiddenException](#forbidden-exception)
@@ -704,6 +712,180 @@ Each media file is uniquely identified by its "media_file_id" sequence number, g
     }
 ]
 ```
+
+## Enumerations<a id="enumerations"></a>
+
+A number of enumerations are provided for use in Record construction or as field value vocabulary as applicable.  The following list indicates the
+descriptions and uses of each of the provided value sets and where they apply.  Each may be individually imported as needed:
+
+```python
+from elinkapi import AccessLimitation, ProductType
+
+>>> AccessLimitation.UNL
+<AccessLimitation.UNL: 'Unlimited'>
+>>> AccessLimitation.UNL.name
+'UNL'
+>>> help(AccessLimitation)
+Help on class AccessLimitation in module elinkapi.record:
+
+class AccessLimitation(enum.Enum)
+ |  AccessLimitation(value, names=None, *, module=None, qualname=None, type=None, start=1, boundary=None)
+ |  
+ |  Access limitations, or distribution limitations, describe the intended audience
+ |  or any restrictions to be placed upon the distribution of this product's metadata
+ |  and/or related full text.  This may range from UNL (Unlimited), being essentially
+ |  no restriction, to various levels of limited audience notations as desired.
+ |  
+ |  Note that many combinations are disallowed as conflicting; UNL may not be 
+ |  combined with most others, for example, while OUO is often combined with various
+ |  other levels (e.g., PROT, SSI, etc.)
+ :
+```
+
+### Access or Distribution Limitations<a id="access-limitation"></a>
+
+Defines one or more access or distribution limitations for the indicated Record, indicating various sensitivity markings or other details about
+how this product should be distributed via OSTI.gov or other OSTI output products, and its dissemination once fully processed.  Note that a number 
+of these (indicated in descriptions below) are legacy or historical in context, and generally will not be accepted as new product or revision data.
+
+Most access limitations beyond UNL will require additional information for definitions in other required fields. Note that only certain combinations of access limitations are valid; sensitive limitations such as PROT, OUO, and the like may not be combined with UNL, for example.
+
+CUI access limitation must be specified alone, and additional CUI markings designated in the access_limitation_other field.
+
+For these enumerations, the Name is also the code value in the Record access_limitations array.
+
+| Name | Description |
+| -- | -- |
+| AT | Applied Technology (legacy) |
+| UNL| Unlimited |
+| OPN | Opennet |
+| CPY | Copyrighted Information |
+| CUI | Controlled Unclassified Information |
+| OUO | Official Use Only |
+| ECI | Export-controlled Information |
+| SSI | Security sensitive information |
+| PROT | Protected data |
+| PAT | Patented information |
+| LRD | Limited Rights Data |
+| PDOUO | Program-determined OUO |
+| NNPI | Naval Navication Propulsion Information |
+| INTL | International Data |
+| ILLIM | International (legacy) |
+| ILUSO | International (legacy) |
+| OTHR | Other/unknown (legacy) |
+| PDSH | Program Directed Sensitive (legacy) |
+| PROP | Protected (legacy) |
+| SBIR | SBIR |
+| STTR | STTR |
+
+### Journal Type<a id="journal-type"></a>
+
+Describes the particular type of this journal publication, and is only applicable to 
+ProductType JA.
+
+| Name | Value | Description/Notes |
+| -- | -- | -- |
+| Manuscript | FT | |
+| DOEAcceptedManuscript | AM | Requires a DOI |
+| DOEAcceptedManuscriptNoDOI | AW | May not specify a DOI, special considerations required |
+| PublishedArticle | PA | CHORUS/Crossref provided publisher article |
+| PublishedAcceptedManuscript | PM | CHORUS/Crossref published accepted manuscript |
+
+### PAMS Publication Status<a id="pams-publication-status"></a>
+
+Specific values for DOE-PAMS related data products only.  Details publication status of the PAMS work.
+
+| Name | Value |
+| -- | -- |
+| Published | PUBLISHED |
+| Other | OTHER |
+| Submitted | SUBMITTED |
+| UnderReview | UNDER_REVIEW |
+| Accepted | ACCEPTED |
+| AwaitingPublication | AWAITING_PUBLICATION |
+| Pending | PENDING |
+| Granted | GRANTED |
+| Licensed | Licensed |
+| NONE | NONE |
+
+### PAMS Patent Status<a id="pams-patent-status"></a>
+
+Specific values for DOE-PAMS related patent data only.  Provides state information of the patent.
+
+| Name | Value |
+| -- | -- |
+| Submitted | 1 |
+| Pending | 2 |
+| Granted | 3 |
+
+### PAMS Product Sub Type<a id="pams-product-sub-type"></a>
+
+Specific values for DOE-PAMS records only.  Further defines the type of PAMS data record.
+
+| Name | Value |
+| -- | -- |
+| JournalArticle | 1 |
+| Book |2 |
+| BookChapter |3 |
+| ThesisDissertation |4 |
+| ConferencePaper |5 |
+| Website |6 |
+| OtherPublication |7 |
+| Patent |8 |
+| Invention |9 |
+| License |10 |
+| AudioVideo |11 |
+| Databases |12 |
+| DataResearchMaterial |13 |
+| EducationAidsCurricula |14 |
+| EvaluationInstruments |15 |
+| InstrumentsEquipment |16 |
+| Models |17 |
+| PhysicalCollections |18 |
+| Protocols |19 |
+| SoftwareNetWare |20 |
+| SurveyInstruments |21 |
+| OtherAwardProduct |22 |
+| TechnologyTechnique |23 |
+
+### Product Type<a id="product-type"></a>
+
+Indicates the type of product represented by this record.  Each product type may require or disallow certain fields; for example,
+JA requires a number of "journal-related" fields, while most other types disallow information in these fields.
+
+| Name | Value |
+| -- | -- |
+| AccomplishmentReport | AR |
+| Book | B |
+| Conference | CO |
+| Dataset | DA |
+| FactSheet | FS |
+| JournalArticle | JA |
+| Miscellaneous | MI |
+| Other | OT |
+| Patent | P |
+| ProgramDocument | PD |
+| SoftwareManual | SM |
+| ThesisDissertation | TD |
+| TechnicalReport | TR |
+| PatentApplication | PA |
+
+### Workflow Status<a id="workflow-status"></a>
+
+Current processing state of a given revision/record.  Users generally submit in Saved ("SA"), SubmitReleasing ("SR"), or SubmitOSTI ("SO"); 
+for the latter state, automated workflow processes will move through the other states ultimately to Released ("R").  Revisions will
+remain in Validated ("SV") state until for example media is attached and processed if applicable.  Failure states, such as FailedValidation ("SF")
+and FailedRelease ("SX") should have explanations in the Record audit log information.
+
+| Name | Value | Notes |
+| -- | -- | -- |
+| Saved | SA | Saved state, no automated processing, usually incomplete record |
+| SubmitReleasing | SR | Submitted to releasing official, must be approved manually by such |
+| SubmitOSTI | SO | Submitted to OSTI, indicating automated workflow processes may finalize this record |
+| Released | R | Completed release, final state of revision |
+| Validated | SV | Validated, but may be awaiting media or further processing |
+| FailedValidation | SF | Failed validation after submission, requires manual edit or revision |
+| FailedRelease | SX | Failed to release, may require additional information or edits |
 
 ## Exceptions<a id="exceptions"></a>
 
