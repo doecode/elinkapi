@@ -119,6 +119,21 @@ class ProductType(Enum):
     TechnicalReport="TR"
     PatentApplication="PA"
 
+class WorkflowStatus(Enum):
+    """
+    Current processing state of a given revision/record.  Users generally submit in Saved ("SA"), SubmitReleasing ("SR"), or SubmitOSTI ("SO"); 
+    for the latter state, automated workflow processes will move through the other states ultimately to Released ("R").  Revisions will
+    remain in Validated ("SV") state until for example media is attached and processed if applicable.  Failure states, such as FailedValidation ("SF")
+    and FailedRelease ("SX") should have explanations in the revision audit log information.
+    """
+    Saved="SA"
+    SubmitReleasing="SR"
+    SubmitOSTI="SO"
+    Released="R"
+    Validated="SV"
+    FailedValidation="SF"
+    FailedRelease="SX"
+
 class Record(BaseModel):
     """
     Describes a particular record or product (e.g., dataset, technical report, journal article, etc.) with all

@@ -8,7 +8,7 @@ from elinkapi.identifier import Identifier
 from elinkapi.organization import Organization
 from elinkapi.record import Record
 from elinkapi.auditlogs import AuditLog
-from elinkapi.record import AccessLimitation, JournalType, ProductType, PAMSPatentStatus, PAMSProductSubType, PAMSPublicationStatus
+from elinkapi.record import AccessLimitation, JournalType, ProductType, PAMSPatentStatus, PAMSProductSubType, PAMSPublicationStatus, WorkflowStatus
 from elinkapi.media_file import MediaFile
 from elinkapi.media_info import MediaInfo
 from elinkapi.related_identifier import RelatedIdentifier
@@ -57,6 +57,7 @@ __all__ = (
     "PAMSPatentStatus",
     "PAMSProductSubType",
     "PAMSPublicationStatus",
+    "WorkflowStatus",
     # method accessors
     "set_api_token",
     "set_target_url",

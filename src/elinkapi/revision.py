@@ -6,15 +6,6 @@ import datetime
 class Revision(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
-    class WorkflowStatus(Enum):
-        Saved="SA"
-        SubmitReleasing="SR"
-        SubmitOSTI="SO"
-        Released="R"
-        Validated="SV"
-        FailedValidation="SF"
-        FailedRelease="SX"
-
     osti_id: int 
     revision: int
     date_valid_start: datetime.datetime

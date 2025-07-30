@@ -131,3 +131,7 @@
 - Support patch methods to update metadata through new endpoints
 - Added documentation and explanations to a number of library functions
 - Accept dict or keyword arguments for Record argument methods
+
+## 0.5.0 - 7/9/2025
+- **Possible breaking change** Moved WorkflowStatus enumeration from Revision subclass to standalone class
+- Added documentation for enumerations in README
