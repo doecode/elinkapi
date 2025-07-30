@@ -318,7 +318,8 @@ class RecordResponse(Record):
     date_metadata_updated: datetime = None
     date_submitted_to_osti_first: datetime = None
     date_submitted_to_osti_last: datetime = None
-    date_released: datetime = None
+    date_released_first: datetime = None
+    date_released_last: datetime = None
     sensitivity_flag: str = None
     hidden_flag: bool = False
     media: list[MediaInfo] = None

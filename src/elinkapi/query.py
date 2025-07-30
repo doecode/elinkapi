@@ -102,7 +102,7 @@ class Query:
         Once this runs out of pages with results, it will raise StopIteration.
         """
         try:
-            record = self.data.pop()
+            record = self.data.pop(0)
 
             return record
         except IndexError:
