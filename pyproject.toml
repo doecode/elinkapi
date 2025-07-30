@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "elinkapi"
-version = "0.4.9" 
+version = "0.5.1" 
 authors = [
-  { name="Jacob Samar", email="samarj@osti.gov" },
-  { name="Neal Ensor", email="ensorn@osti.gov" }
+  { name="Neal Ensor", email="ensorn@osti.gov" },
+  { name="Jacob Samar" }
 ]
 description = "OSTI E-Link 2 API package"
 readme = "README.md"
@@ -30,3 +30,4 @@ development = ["twine", "build"]
 [project.urls]
 Homepage = "https://github.com/doecode/elinkapi"
 Issues = "https://github.com/doecode/elinkapi/issues"
+Changelog = "https://github.com/doecode/elinkapi/blob/main/CHANGELOG.md"
