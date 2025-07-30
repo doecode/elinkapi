@@ -1,7 +1,7 @@
 from enum import Enum
 from .identifier import Identifier
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
-from typing import List
+from typing import List, Optional
 from .utils import Validation
 from .contribution import Contribution
 
@@ -28,10 +28,10 @@ class Organization(BaseModel):
         PAMS_TD_INST="PAMS_TD_INST"
 
     type:str
-    name:str = None
-    contributor_type: str = None
-    identifiers: List[Identifier] = None
-    ror_id:str = None
+    name:Optional[str] = None
+    contributor_type: Optional[str] = None
+    identifiers: Optional[List[Identifier]] = None
+    ror_id:Optional[str] = None
 
     @model_validator(mode = 'after')
     def name_or_ror(self):

@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, ConfigDict, field_validator
-from typing import List
+from typing import List, Optional
 from .affiliation import Affiliation
 from .contribution import Contribution
 
@@ -30,14 +30,14 @@ class Person(BaseModel):
         PRINCIPAL_INVESTIGATOR="SBIZ_PI"
         
     type: str
-    first_name: str = None
-    middle_name: str = None
+    first_name: Optional[str] = None
+    middle_name: Optional[str] = None
     last_name: str
-    orcid: str = None
-    phone: str = None
-    email: List[str] = None
-    affiliations: List[Affiliation] = None
-    contributor_type: str = None
+    orcid: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[List[str]] = None
+    affiliations: Optional[List[Affiliation]] = None
+    contributor_type: Optional[str] = None
 
     @field_validator("type")
     @classmethod
@@ -49,7 +49,7 @@ class Person(BaseModel):
     @field_validator("contributor_type")
     @classmethod
     def contributor_must_be_valid(cls, value) -> str:
-        if value not in [type.value for type in Contribution]:
+        if value and value not in [type.value for type in Contribution]:
             raise ValueError('Unknown contributor type value {}.'.format(value))
         return value
     
