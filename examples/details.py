@@ -64,6 +64,9 @@ def info(argv):
 
         print ("\nMedia Information:")
 
+        if not record.media:
+            print ("- No media associated.")
+
         for media in record.media:
             print (f"- Media ID {media.media_id}, added {media.date_added}, updated {media.date_updated}.  State {media.status}")
             print ("  Files:")

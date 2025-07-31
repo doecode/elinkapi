@@ -17,13 +17,13 @@ A few sample python projects demonstrating usage of the connector library.
 
 ### Search
 
-Example search of the most-recently-updated 50 records in "SV" workflow status, if any.
+Example search of the most-recently-updated 50 records in "SV" workflow status, if any.  Shows record querying and iterating through set of results.
 
 `python search.py`
 
 ### Reserve DOI
 
-Reserve a DOI for a dataset at OSTI, given a site code and title from the command-line.  
+Reserve a DOI for a dataset at OSTI, given a site code and title from the command-line.  Example usage of DOI reservation API call.
 
 `python reserve.py --site SITECODE --title TITLE`
 
@@ -38,4 +38,12 @@ options:
   -t TITLE, --title TITLE
                         Required document title to use for reservation.
 ```
+
+### Details
+
+Query a single record by its OSTI ID and display various details about its metadata and state, including any pending issues from audit logs if 
+applicable.  Demonstrates pulling in single OSTI ID record and use of the Record class, as well as exception handling for "not found" or
+"permission denied" cases.
+
+`python details.py --id OSTIID`
 
