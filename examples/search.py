@@ -1,3 +1,4 @@
+from pydantic import ValidationError
 from config import TARGET, TOKEN
 from elinkapi import Elink, WorkflowStatus
 import sys, argparse
@@ -26,20 +27,24 @@ def search_for(argv):
     # make an API link
     api = Elink(target = TARGET, token = TOKEN)
 
-    # get a query
-    query = api.query_records(workflow_status = args.status, sortby="date_metadata_updated")
+    # get a query (might throw a pydantic error)
+    try:
+      query = api.query_records(workflow_status = args.status, sortby="date_metadata_updated")
 
-    # print the summary, header, and records
-    print (f"Found {query.total_rows} matching records in state {status.name}, first {args.count}.\n")
+      # print the summary, header, and records
+      print (f"Found {query.total_rows} matching records in state {status.name}, first {args.count}.\n")
 
-    print ("#".center(3, "_"), "OSTI ID".center(10,"_"), "TITLE".center(60, "_"), "UPDATED".center(20, "_"))
+      print ("#".center(3, "_"), "OSTI ID".center(10,"_"), "TITLE".center(60, "_"), "UPDATED".center(20, "_"))
 
-    for n, record in enumerate(query):
-      print (f'{n+1:2d}. {record.osti_id:10d} {record.title:60.60s} {record.date_metadata_updated.strftime("%Y-%m-%d %H:%M:%S")}')
+      for n, record in enumerate(query):
+        print (f'{n+1:2d}. {record.osti_id:10d} {record.title:60.60s} {record.date_metadata_updated.strftime("%Y-%m-%d %H:%M:%S")}')
 
-      # stop at requested count (0-based)
-      if n==(args.count-1):
-        break
+        # stop at requested count (0-based)
+        if n==(args.count-1):
+          break
+    except ValidationError as e:
+       print (f"One or more record validation errors, cannot retrieve details.")
 
+       
 if __name__ == "__main__":
    search_for(sys.argv[1:])

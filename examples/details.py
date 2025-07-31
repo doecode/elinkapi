@@ -1,4 +1,4 @@
-from elinkapi import Elink, ProductType, ForbiddenException, NotFoundException, WorkflowStatus
+from elinkapi import Elink, ForbiddenException, NotFoundException, WorkflowStatus, Identifier
 import argparse, sys
 from config import TARGET, TOKEN
 
@@ -10,6 +10,22 @@ def audit(logs):
         print (f"- {log.type} on {log.audit_date.strftime('%Y-%m-%d %H:%M:%S')}, state {log.status}")
         for message in log.messages:
             print (f"  * {message}")
+
+def print_person(p):
+    """
+    Print details on a particular Person record.
+    """
+    print ("  * {0}, {1} {2} {3}".format(p.last_name, 
+                                         p.first_name, 
+                                         p.middle_name if p.middle_name else "", 
+                                         p.contributor_type if p.contributor_type else ""))
+    
+def print_organization(o):
+    """
+    Print organization details.
+    """
+    print ("  * {0} {1}".format(o.name,
+                                o.contributor_type if o.contributor_type else ""))
 
 def info(argv):
     """
@@ -61,6 +77,32 @@ def info(argv):
         print (f"  * Last Released {record.date_released_last}")
 
         print (f"Description:\n{record.description}")
+
+        print ("Persons:")
+
+        print ("- AUTHORS")
+        for person in list(filter(lambda x: x.type=="AUTHOR", record.persons)):
+            print_person(person)
+
+        print ("- CONTRIBUTORS")
+        for person in list(filter(lambda c: c.type=="CONTRIBUTING", record.persons)):
+            print_person(person)
+
+        print ("Organizations:")
+        print ("- SPONSORING")
+        for organization in list(filter(lambda x: x.type=="SPONSOR", record.organizations)):
+            print_organization(organization)
+
+        print ("- RESEARCHING")
+        for organization in list(filter(lambda x: x.type=="RESEARCHING", record.organizations)):
+            print_organization(organization)
+        print ("- CONTRIBUTING")
+        for organization in list(filter(lambda x: x.type=="CONTRIBUTING", record.organizations)):
+            print_organization(organization)
+
+        print ("Identifiers:")
+        for identifier in record.identifiers:
+            print ("- {0} ({1})".format(identifier.value, Identifier.Type(identifier.type).name))
 
         print ("\nMedia Information:")
 
