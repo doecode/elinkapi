@@ -18,6 +18,7 @@ def search_for(argv):
 
     parser = argparse.ArgumentParser("search", description="Find list of records at OSTI for a given workflow status code.")
     parser.add_argument("-s", "--status", help="Workflow status to find.  Default is SV.", type=str, default=WorkflowStatus.Validated.value)
+    parser.add_argument("-p", "--product", help="Product type to find.", type=str)
     parser.add_argument("-c", "--count", help="Number of records to display, default is 50.", type=int, default=50)
     args = parser.parse_args()
     
@@ -28,8 +29,13 @@ def search_for(argv):
     api = Elink(target = TARGET, token = TOKEN)
 
     # get a query (might throw a pydantic error)
+    parameters = { "workflow_status": args.status, "sortby": "date_metadata_updated" }
+
+    if args.product:
+       parameters['product_type'] = args.product
+
     try:
-      query = api.query_records(workflow_status = args.status, sortby="date_metadata_updated")
+      query = api.query_records(**parameters)
 
       # print the summary, header, and records
       print (f"Found {query.total_rows} matching records in state {status.name}, first {args.count}.\n")

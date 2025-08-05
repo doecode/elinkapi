@@ -114,6 +114,8 @@ def info(argv):
             print ("  Files:")
             for file in media.files:
                 print(f"  * Media File ID {file.media_file_id} Status {file.status}")
+                if file.processing_exceptions:
+                    print(f"    - Exceptions: {file.processing_exceptions}")
                 
     except ForbiddenException as e:
         print (f"Access denied to ID {args.id}")
