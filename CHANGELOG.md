@@ -142,3 +142,4 @@
 - Fix issue in query results iterating incorrectly
 - Adding "examples" to repository containing several sample code examples
 - **[Breaking change]** Removed field date_released; replaced by date_first_released and date_last_released
+- Fix issue with unexpected list values

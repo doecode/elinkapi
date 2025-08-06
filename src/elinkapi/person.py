@@ -35,7 +35,7 @@ class Person(BaseModel):
     last_name: str
     orcid: Optional[str] = None
     phone: Optional[str] = None
-    email: Optional[List[str]] = None
+    email: Optional[List[Optional[str]]] = None
     affiliations: Optional[List[Affiliation]] = None
     contributor_type: Optional[str] = None
 
