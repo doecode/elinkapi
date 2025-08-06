@@ -135,3 +135,11 @@
 ## 0.5.0 - 7/9/2025
 - **Possible breaking change** Moved WorkflowStatus enumeration from Revision subclass to standalone class
 - Added documentation for enumerations in README
+
+## 0.5.1 - 7/30/2025
+- Made non-required pydantic class attributes "fully Optional" allowing null or None
+- Add MM/DD/YYYY as an acceptable "publication_date" format for dict/JSON Record creation
+- Fix issue in query results iterating incorrectly
+- Adding "examples" to repository containing several sample code examples
+- **[Breaking change]** Removed field date_released; replaced by date_first_released and date_last_released
+- Fix issue with unexpected list values

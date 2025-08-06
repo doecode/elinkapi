@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from .utils import Validation
+from typing import Optional
 
 class Affiliation(BaseModel):
     """
@@ -10,8 +11,8 @@ class Affiliation(BaseModel):
     """
     model_config = ConfigDict(validate_assignment=True)
 
-    name:str = None
-    ror_id:str = None
+    name:Optional[str] = None
+    ror_id:Optional[str] = None
 
     @model_validator(mode = 'after')
     def name_or_ror(self):
@@ -22,5 +23,6 @@ class Affiliation(BaseModel):
     @field_validator("ror_id")
     @classmethod
     def validate_ror_id(cls, value: str) -> str:
-        Validation.find_ror_value(value)
+        if value: 
+            Validation.find_ror_value(value)
         return value

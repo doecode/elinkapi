@@ -7,8 +7,8 @@ from .organization import Organization
 from .geolocation import Geolocation
 from .auditlogs import AuditLog
 from pydantic import BaseModel, ConfigDict, field_validator
-from typing import List
-import datetime
+from typing import List, Optional
+from datetime import datetime, date
 
 class AccessLimitation(Enum):
     """
@@ -155,86 +155,86 @@ class Record(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
     osti_id: int = None
-    workflow_status: str = None
-    access_limitations: List[str] = None
-    access_limitation_other: str = None
-    announcement_codes: List[str] = None
-    availability: str = None
-    edition: str = None
-    volume: str = None
-    conference_information: str = None
-    conference_type: str = None
-    contract_award_date: datetime.date = None
-    country_publication_code: str = "US"
-    doe_funded_flag: str = None
-    doe_supported_flag: bool = None
-    doi: str = None
-    doi_infix: str = None
-    edit_reason: str = None
-    geolocations: List[Geolocation] = None
-    format_information: str = None
-    invention_disclosure_flag: bool = None
-    issue: str = None
-    journal_license_url: str = None
-    journal_name: str = None
-    journal_open_access_flag: str = None
-    journal_type: str = None
-    keywords: List[str] = None
-    languages: List[str] = ["English"]
-    monographic_title: str = None
-    opn_addressee: str = None
-    opn_declassified_date: datetime.date = None
-    opn_declassified_status: str = None
-    opn_document_categories: List[str] = None
-    opn_document_location: str = None
-    opn_fieldoffice_acronym_code: str = None
-    other_information: List[str] = None
-    ouo_release_date: datetime.date = None
-    pams_publication_status: str = None
-    pams_publication_status_other: str = None
-    pams_authors: str = None
-    pams_editors: str = None
+    workflow_status: Optional[str] = None
+    access_limitations: Optional[List[str]] = None
+    access_limitation_other: Optional[str] = None
+    announcement_codes: Optional[List[str]] = None
+    availability: Optional[str] = None
+    edition: Optional[str] = None
+    volume: Optional[str] = None
+    conference_information: Optional[str] = None
+    conference_type: Optional[str] = None
+    contract_award_date: Optional[date] = None
+    country_publication_code: Optional[str] = "US"
+    doe_funded_flag: Optional[str] = None
+    doe_supported_flag: Optional[bool] = None
+    doi: Optional[str] = None
+    doi_infix: Optional[str] = None
+    edit_reason: Optional[str] = None
+    geolocations: Optional[List[Geolocation]] = None
+    format_information: Optional[str] = None
+    invention_disclosure_flag: Optional[bool] = None
+    issue: Optional[str] = None
+    journal_license_url: Optional[str] = None
+    journal_name: Optional[str] = None
+    journal_open_access_flag: Optional[str] = None
+    journal_type: Optional[str] = None
+    keywords: Optional[List[str]] = None
+    languages: Optional[List[str]] = ["English"]
+    monographic_title: Optional[str] = None
+    opn_addressee: Optional[str] = None
+    opn_declassified_date: Optional[date] = None
+    opn_declassified_status: Optional[str] = None
+    opn_document_categories: Optional[List[str]] = None
+    opn_document_location: Optional[str] = None
+    opn_fieldoffice_acronym_code: Optional[str] = None
+    other_information: Optional[List[str]] = None
+    ouo_release_date: Optional[date] = None
+    pams_publication_status: Optional[str] = None
+    pams_publication_status_other: Optional[str] = None
+    pams_authors: Optional[str] = None
+    pams_editors: Optional[str] = None
     pams_product_sub_type: int = None
-    pams_patent_country_code: str = None
-    pams_transnational_patent_office: str = None
-    paper_flag: bool = None
-    patent_assignee: str = None
-    patent_file_date: datetime.date = None
-    patent_priority_date: datetime.date = None
-    pdouo_exemption_number: str = None
-    peer_reviewed_flag: bool = None
-    product_size: str = None
+    pams_patent_country_code: Optional[str] = None
+    pams_transnational_patent_office: Optional[str] = None
+    paper_flag: Optional[bool] = None
+    patent_assignee: Optional[str] = None
+    patent_file_date: Optional[date] = None
+    patent_priority_date: Optional[date] = None
+    pdouo_exemption_number: Optional[str] = None
+    peer_reviewed_flag: Optional[bool] = None
+    product_size: Optional[str] = None
     product_type: str
-    product_type_other: str = None
-    prot_flag: str = None
-    prot_data_other: str = None 
-    prot_release_date: datetime.date = None
-    publication_date: datetime.date = None
-    publication_date_text: str = None
-    publisher_information: str = None
-    related_doc_info: str = None
-    released_to_osti_date: datetime.date = None
-    releasing_official_comments: str = None
-    report_period_end_date: datetime.date = None
-    report_period_start_date: datetime.date = None
-    report_types: List[str] = None
-    report_type_other: str = None
-    sbiz_flag: str = None
-    sbiz_phase: str = None
-    sbiz_previous_contract_number: str = None
-    sbiz_release_date: datetime.date = None
-    site_ownership_code: str = None
-    site_unique_id: str = None
-    subject_category_code: List[str] = None
-    subject_category_code_legacy: List[str] = None
+    product_type_other: Optional[str] = None
+    prot_flag: Optional[str] = None
+    prot_data_other: Optional[str] = None 
+    prot_release_date: Optional[date] = None
+    publication_date: Optional[date] = None
+    publication_date_text: Optional[str] = None
+    publisher_information: Optional[str] = None
+    related_doc_info: Optional[str] = None
+    released_to_osti_date: Optional[date] = None
+    releasing_official_comments: Optional[str] = None
+    report_period_end_date: Optional[date] = None
+    report_period_start_date: Optional[date] = None
+    report_types: Optional[List[str]] = None
+    report_type_other: Optional[str] = None
+    sbiz_flag: Optional[str] = None
+    sbiz_phase: Optional[str] = None
+    sbiz_previous_contract_number: Optional[str] = None
+    sbiz_release_date: Optional[date] = None
+    site_ownership_code: Optional[str] = None
+    site_unique_id: Optional[str] = None
+    subject_category_code: Optional[List[str]] = None
+    subject_category_code_legacy: Optional[List[str]] = None
     title: str
-    description: str = None
-    publication_date: datetime.date = None
-    identifiers: List[Identifier] = None
-    persons: List[Person] = None
-    organizations: List[Organization] = None
-    related_identifiers: List[RelatedIdentifier] = None
-    site_url: str = None
+    description: Optional[str] = None
+    publication_date: Optional[date] = None
+    identifiers: Optional[List[Identifier]] = None
+    persons: Optional[List[Person]] = None
+    organizations: Optional[List[Organization]] = None
+    related_identifiers: Optional[List[RelatedIdentifier]] = None
+    site_url: Optional[str] = None
 
     @field_validator("access_limitations")
     @classmethod
@@ -246,6 +246,25 @@ class Record(BaseModel):
         if bad_values:
             raise ValueError('Unknown Access Limitation value(s): {}'.format(','.join(bad_values)))
         return value
+    
+    @field_validator("publication_date", mode='before')
+    @classmethod
+    def parse_date(cls, value) -> date:
+        """
+        Define several acceptable date-string formats to parse.
+        """
+        format_strings=["%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d"]
+
+        # attempt each format to attempt parsing dates
+        for format in format_strings:
+            try:
+                return datetime.strptime(value, format).date()
+            except ValueError:
+                # skip validation errors
+                pass
+
+        # wasn't able to parse
+        raise ValueError(f"Cannot parse {value} as a date.")
     
     @field_validator("product_type")
     @classmethod
@@ -295,11 +314,12 @@ class RecordResponse(Record):
     added_by: int = None
     edited_by: int = None
     collection_type: str = None   
-    date_metadata_added: datetime.datetime = None
-    date_metadata_updated: datetime.datetime = None
-    date_submitted_to_osti_first: datetime.datetime = None
-    date_submitted_to_osti_last: datetime.datetime = None
-    date_released: datetime.datetime = None
+    date_metadata_added: datetime = None
+    date_metadata_updated: datetime = None
+    date_submitted_to_osti_first: datetime = None
+    date_submitted_to_osti_last: datetime = None
+    date_released_first: datetime = None
+    date_released_last: datetime = None
     sensitivity_flag: str = None
     hidden_flag: bool = False
     media: list[MediaInfo] = None
