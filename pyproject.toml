@@ -31,3 +31,4 @@ development = ["twine", "build"]
 Homepage = "https://github.com/doecode/elinkapi"
 Issues = "https://github.com/doecode/elinkapi/issues"
 Changelog = "https://github.com/doecode/elinkapi/blob/main/CHANGELOG.md"
+Examples = "https://github.com/doecode/elinkapi/tree/main/examples"
