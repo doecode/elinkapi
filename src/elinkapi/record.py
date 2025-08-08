@@ -320,6 +320,8 @@ class RecordResponse(Record):
     date_submitted_to_osti_last: datetime = None
     date_released_first: datetime = None
     date_released_last: datetime = None
+    date_valid_start: datetime = None
+    date_valid_end: datetime = None
     sensitivity_flag: str = None
     hidden_flag: bool = False
     media: list[MediaInfo] = None

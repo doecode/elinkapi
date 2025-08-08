@@ -14,6 +14,7 @@
       - [Seeing Validation Errors on Exception](#seeing-validation-errors-on-exception)
       - [Processing Status of Submitted Records](#processing-status-of-submitted-records)
       - [View Revision History](#view-revision-history)
+      - [VIew Record at Revision](#view-record-at-revision)
       - [Adding Media to Record](#adding-media-to-record)
       - [Removing Metadata Records](#removing-record)
       - [Removing Media from a Record](#removing-media-from-a-record)
@@ -230,6 +231,25 @@ oldest_revision = revision_history[-1]
 ```
 
 Various components of record history are available in each revision summary, such as the `date_valid_start` and `date_valid_end`, `workflow_status`, etc. The dates indicate the time frame during which that revision was "current"; if `date_valid_end` is null, this indicates that particular revision is the current one.
+
+#### View Record at Revision<a id="view-record-at-revision"></a>
+```python
+from elinkapi import Elink, NotFoundException, ForbiddenException
+
+api = Elink(token = "__Your_API_Token__")
+
+try:
+    record = api.get_revision_by_number(4525922,2)
+
+    record.json()
+
+    print ("Revision valid from {} to {}".format(record.date_valid_start,
+                                                 record.date_valid_end if record.date_valid_end else "Present"))
+except NotFoundException:
+    print ("Revision not on file.")
+except ForbiddenException:
+    print ("Permission to view record denied.")
+```
 
 #### Adding Media to Record<a id="adding-media-to-record"></a>
 ```python

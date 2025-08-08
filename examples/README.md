@@ -47,3 +47,22 @@ applicable.  Demonstrates pulling in single OSTI ID record and use of the Record
 
 `python details.py --id OSTIID`
 
+### History
+
+Obtain summary of historical revisions of a particular record at OSTI by its OSTI ID.  Optionally, view some details for a provided revision
+number to see its state at that point in time.
+
+`python history.py --id OSTIID [--revision REVISION]`
+
+```
+usage: history [-h] -i ID [-r REVISION]
+
+Summary of metadata revision history at OSTI.
+
+options:
+  -h, --help            show this help message and exit
+  -i ID, --id ID        OSTI ID of record to view.
+  -r REVISION, --revision REVISION
+                        Optional revision number for a particular revision. Omit for summary of all
+                        revisions.
+```

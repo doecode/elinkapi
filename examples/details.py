@@ -6,10 +6,14 @@ def audit(logs):
     """
     Print out details from the audit logs.
     """
+    print ("Type".center(20,"_"), "Audit Date".center(30,"_"), "State".center(15,"_"))
+
     for log in logs:
-        print (f"- {log.type} on {log.audit_date.strftime('%Y-%m-%d %H:%M:%S')}, state {log.status}")
-        for message in log.messages:
-            print (f"  * {message}")
+        print ("{0:20.20s} {1:30.30s} {2:15.15s}".format(log.type,
+                                                         log.audit_date.strftime("%Y-%m-%d %H:%M:%S %z"),
+                                                         log.status))
+        for message in log.messages if log.messages else []:
+            print ("  - {message}")
 
 def print_person(p):
     """

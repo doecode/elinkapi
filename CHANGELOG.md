@@ -143,3 +143,6 @@
 - Adding "examples" to repository containing several sample code examples
 - **[Breaking change]** Removed field date_released; replaced by date_first_released and date_last_released
 - Fix issue with unexpected list values
+
+## 0.5.2 - 8/8/2025
+- Fix issue with revision history WorkflowStatus (github #3)
