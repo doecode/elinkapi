@@ -13,7 +13,7 @@ def audit(logs):
                                                          log.audit_date.strftime("%Y-%m-%d %H:%M:%S %z"),
                                                          log.status))
         for message in log.messages if log.messages else []:
-            print ("  - {message}")
+            print (f"  - {message}")
 
 def print_person(p):
     """

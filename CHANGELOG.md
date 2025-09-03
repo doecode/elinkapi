@@ -146,3 +146,9 @@
 
 ## 0.5.2 - 8/8/2025
 - Fix issue with revision history WorkflowStatus (github #3)
+
+## 0.5.3 - 9/2/2025
+- Fix issue with ROR ID validation regular expression (github #7)
+- Add support for datetime.date on publication_date (github #6)
+- Consistently support JSON on various PATCH requests
+- fix log output issue on examples/details.py

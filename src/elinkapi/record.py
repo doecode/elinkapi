@@ -255,6 +255,10 @@ class Record(BaseModel):
         """
         format_strings=["%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d"]
 
+        # if already a date, we're done here
+        if isinstance(value, date):
+            return value
+
         # attempt each format to attempt parsing dates
         for format in format_strings:
             try:

@@ -2,7 +2,7 @@ import re
 from .exceptions import NotFoundException,ForbiddenException,UnauthorizedException,ServerException,ConflictException,BadRequestException
 
 class Validation:
-    _ROR_ID_PATTERN = re.compile("^(?:(?:(http(s?):\/\/)?(?:ror\.org\/)))?(0[a-hj-km-np-tv-z|0-9]{6}[0-9]{2})$")
+    _ROR_ID_PATTERN = re.compile(r"^(?:(?:(http(s?)://)?(?:ror\.org\/)))?(0[a-hj-km-np-tv-z|0-9]{6}[0-9]{2})$")
 
     @classmethod
     def find_ror_value(cls, value:str) -> str:

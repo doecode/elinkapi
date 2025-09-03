@@ -273,7 +273,7 @@ class Elink:
                             "Authorization" : f"Bearer {self.token}",
                             "Content-Type": "application/json"
                         },
-                        data=str(patch))
+                        data=json.dumps(patch))
         
         Validation.handle_response(response)
 
