@@ -1,5 +1,8 @@
 import requests
 from urllib.parse import urlencode
+from urllib3.util import Retry
+from requests import Session
+from requests.adapters import HTTPAdapter
 import json
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from .exceptions import NotFoundException,ForbiddenException,UnauthorizedException,ServerException,ConflictException,BadRequestException
@@ -63,6 +66,26 @@ class Elink:
         """
         self.token = token
         self.target = target or "https://www.osti.gov/elink2api/"
+
+    def _get_session(self):
+        """
+        Set up a requests Session with retry for automatic re-attempts.
+        """
+        session = Session()
+        # set up a retry strategy
+        retries = Retry (
+            total = 5,
+            backoff_factor=1,
+            status_forcelist=[408, 500, 502, 503, 504]
+        )
+        # create a session adapter
+        adapter = HTTPAdapter(max_retries = retries)
+        # hook up HTTP and HTTPS
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+
+        # ship it
+        return session
 
     def _convert_response_to_records(self, response):
         """Returns array of Records"""
@@ -137,7 +160,7 @@ class Elink:
         Returns:
             Record - metadata of a single record 
         """
-        response = requests.get(f'{self.target}/records/{osti_id}',
+        response = self._get_session().get(f'{self.target}/records/{osti_id}',
                                 headers = { "Authorization" : f"Bearer {self.token}"})
         Validation.handle_response(response)
         
@@ -167,7 +190,7 @@ class Elink:
         if(len(kwargs) > 0):
             query_params = "?" + urlencode(kwargs)
 
-        response = requests.get(f"{self.target}/records{query_params}", 
+        response = self._get_session().get(f"{self.target}/records{query_params}", 
                                 headers={"Authorization": f"Bearer {self.token}"})
         
         Validation.handle_response(response)
@@ -240,7 +263,7 @@ class Elink:
         # make a Record from provided arguments
         record = self._convert_record(record=r, **kwargs)
         # post it as a new record
-        response = requests.post(f"{self.target}records/{state}", 
+        response = self._get_session().post(f"{self.target}records/{state}", 
                                  headers={
                                      "Authorization": f"Bearer {self.token}", 
                                      "Content-Type": "application/json" 
@@ -268,7 +291,7 @@ class Elink:
         Returns:
             Record -- the metadata of the new record revision if successful
         """
-        response = requests.patch(f"{self.target}/records/{osti_id}/{state}",
+        response = self._get_session().patch(f"{self.target}/records/{osti_id}/{state}",
                         headers = { 
                             "Authorization" : f"Bearer {self.token}",
                             "Content-Type": "application/json"
@@ -297,7 +320,7 @@ class Elink:
         Returns:
             Record -- the metadata of the new revision with operations performed if successful
         """
-        response = requests.patch(f"{self.target}/records/{osti_id}/{state}",
+        response = self._get_session().patch(f"{self.target}/records/{osti_id}/{state}",
                                   headers = {
                                       "Authorization" : f"Bearer {self.token}",
                                       "Content-Type": "application/json-patch+json"
@@ -327,7 +350,7 @@ class Elink:
         # get a record
         record = self._convert_record(record=r, **kwargs)
         # send the UPDATE
-        response = requests.put(f"{self.target}records/{osti_id}/{state}", 
+        response = self._get_session().put(f"{self.target}records/{osti_id}/{state}", 
                                 headers={
                                     "Authorization": f"Bearer {self.token}"
                                 }, 
@@ -348,7 +371,7 @@ class Elink:
         Returns:
             Record - The metadata of the Record at the given revision number
         """
-        response = requests.get(f"{self.target}records/revision/{osti_id}/at/{revision_number}", 
+        response = self._get_session().get(f"{self.target}records/revision/{osti_id}/at/{revision_number}",
                                 headers={
                                     "Authorization": f"Bearer {self.token}"
                                 })
@@ -372,7 +395,7 @@ class Elink:
         Returns:
             Record - The metadata of the Record on the given date
         """
-        response = requests.get(f"{self.target}records/revision/{osti_id}/dated/{date}", 
+        response = self._get_session().get(f"{self.target}records/revision/{osti_id}/dated/{date}",
                                 headers={"Authorization": f"Bearer {self.token}"})
 
         # Special case on this exception -> Get 404's when date is before record creation
@@ -393,7 +416,7 @@ class Elink:
         Returns:
             RevisionHistory - All the metadata of the revisions of a record
         """
-        response = requests.get(f"{self.target}records/revision/{osti_id}", 
+        response = self._get_session().get(f"{self.target}records/revision/{osti_id}",
                                 headers={"Authorization": f"Bearer {self.token}"})
 
         Validation.handle_response(response)
@@ -411,7 +434,7 @@ class Elink:
         Returns:
             List[RevisionComparison]
         """
-        response = requests.get(f"{self.target}records/revision/{osti_id}/compare/{left}/{right}", 
+        response = self._get_session().get(f"{self.target}records/revision/{osti_id}/compare/{left}/{right}", 
                                 headers={"Authorization": f"Bearer {self.token}"})
 
         Validation.handle_response(response)
@@ -429,7 +452,7 @@ class Elink:
         Returns:
             List[MediaInfo] - info on all the media associated with the osti_id
         """
-        response = requests.get(f'{self.target}media/{osti_id}',
+        response = self._get_session().get(f'{self.target}media/{osti_id}',
                                 headers = { "Authorization" : f"Bearer {self.token}" })
         
         Validation.handle_response(response)
@@ -445,7 +468,7 @@ class Elink:
         Returns:
             Binary string that is the content associated with the media_file_id
         """
-        response = requests.get(f"{self.target}media/file/{media_file_id}", 
+        response = self._get_session().get(f"{self.target}media/file/{media_file_id}",
                                 headers={"Authorization": f"Bearer {self.token}"})
 
         Validation.handle_response(response)
@@ -518,7 +541,7 @@ class Elink:
                 mp_encoder = MultipartEncoder(
                     fields={'file': (filename, response.content, mimetypes.guess_type(filename)[0])}
                 )
-                response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
                             data=mp_encoder)
             else:
@@ -527,7 +550,7 @@ class Elink:
                             fields={'file': (filename, f, mimetypes.guess_type(filename)[0] )}
                     )
 
-                    response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                    response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
                             data=m)
         else:
@@ -558,11 +581,11 @@ class Elink:
                 res = requests.get(file_path)
                 filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
 
-                response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}"},
                             files={'file': (filename, res.content, mimetypes.guess_type(filename)[0])})
             else:
-                response = requests.post(f'{self.target}media/{osti_id}{query_params}',
+                response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
                         headers = { "Authorization" : f"Bearer {self.token}"},
                         files={ 'file': open(file_path, 'rb') })
         else:
@@ -638,7 +661,7 @@ class Elink:
                 mp_encoder = MultipartEncoder(
                     fields={'file': (filename, response.content, mimetypes.guess_type(filename)[0])}
                 )   
-                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
                             data=mp_encoder)
                 
@@ -648,7 +671,7 @@ class Elink:
                             fields={'file': (filename, f, mimetypes.guess_type(filename)[0] )}
                     )
 
-                    response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                    response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
                             data=m)
         else:
@@ -678,11 +701,11 @@ class Elink:
                 res = requests.get(file_path)
                 filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
 
-                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                             headers = { "Authorization" : f"Bearer {self.token}"},
                             files={'file': (filename, res.content, mimetypes.guess_type(filename)[0]) })
             else:
-                response = requests.put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
                         headers = { "Authorization" : f"Bearer {self.token}"},
                         files={ 'file': open(file_path, 'rb') })
         else:
@@ -706,7 +729,7 @@ class Elink:
             ServerException -- unknown service error occurred
         """
 
-        response = requests.delete(f"{self.target}records/{osti_id}?reason={reason}",
+        response = self._get_session().delete(f"{self.target}records/{osti_id}?reason={reason}",
                                    headers = { "Authorization" : f"Bearer {self.token}"})
         
         Validation.handle_response(response)
@@ -740,7 +763,7 @@ class Elink:
         Returns:
             int - the total number of rows removed
         """
-        response = requests.delete(f"{self.target}media/{osti_id}?reason={reason}", headers={"Authorization": f"Bearer {self.token}"})
+        response = self._get_session().delete(f"{self.target}media/{osti_id}?reason={reason}", headers={"Authorization": f"Bearer {self.token}"})
 
         Validation.handle_response(response)
         

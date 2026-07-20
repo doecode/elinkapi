@@ -152,3 +152,6 @@
 - Add support for datetime.date on publication_date (github #6)
 - Consistently support JSON on various PATCH requests
 - fix log output issue on examples/details.py
+
+## 0.5.4 - 7/20/2026
+- Adding support for automatic retries on API interactions
