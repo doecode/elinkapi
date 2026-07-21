@@ -105,6 +105,7 @@ class ProductType(Enum):
     JA requires a number of "journal-related" fields, while most other types disallow information in these fields.
     """
     AccomplishmentReport="AR"
+    Audiovisual="AV"
     Book="B"
     Conference="CO"
     Dataset="DA"
