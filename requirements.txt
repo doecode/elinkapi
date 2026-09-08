@@ -1,10 +1,10 @@
-annotated-types==0.7.0
+annotated-types
 certifi
-charset-normalizer==3.3.2
-idna==3.7
-pydantic==2.8.2
-pydantic-core==2.20.1
+charset-normalizer
+idna
+pydantic
+pydantic-core
 requests>=2.32.4
-requests-toolbelt==1.0.0
-typing-extensions==4.12.2
+requests-toolbelt>=1.0.0
+typing-extensions
 urllib3
