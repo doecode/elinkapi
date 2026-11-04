@@ -34,6 +34,7 @@ class Identifier(BaseModel):
         REFERENCE_NUMBER="REF"
         REL_TRN="REL_TRN"
         REPORT_NUMBER="RN"
+        SCL="SCL"
         TRN="TRN"
         TVI="TVI"
         USER_VERSION_NUMBER="USER_VER"

@@ -155,3 +155,6 @@
 
 ## 0.5.4 - 7/20/2026
 - Adding support for automatic retries on API interactions
+
+## 0.5.5 - 11/4/2026
+- Adding SCL for Identifiers enumeration
