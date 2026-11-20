@@ -491,6 +491,9 @@ class Elink:
             
         Returns:
             MediaInfo 
+        Raises:
+            FileNotFoundError: if indicated file path is not found
+            IOError: other file-related errors
         """
         query_params = ""
         parameters = {}
@@ -528,31 +531,23 @@ class Elink:
             
         Returns:
             MediaInfo 
+        Raises:
+            FileNotFoundError: if indicated file path is not found
+            IOError: other file-related errors
         """
         # get a filename component from the path, or make a default
         filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
 
         # if posting a FILE, send that; if not, send just the PARAMETERS
         if file_path is not None:
-            if(file_path.startswith("http")):
-                response = requests.get(file_path, stream=True)
-                response.raw.decode_content = True
-                
-                mp_encoder = MultipartEncoder(
-                    fields={'file': (filename, response.content, mimetypes.guess_type(filename)[0])}
+            with open(file_path, 'rb') as f:
+                m = MultipartEncoder(
+                        fields={'file': (filename, f, mimetypes.guess_type(filename)[0] )}
                 )
-                response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
-                            headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
-                            data=mp_encoder)
-            else:
-                with open(file_path, 'rb') as f:
-                    m = MultipartEncoder(
-                            fields={'file': (filename, f, mimetypes.guess_type(filename)[0] )}
-                    )
 
-                    response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
-                            headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
-                            data=m)
+                response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
+                        headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
+                        data=m)
         else:
             raise ValueError("File path is missing.")
             
@@ -573,21 +568,16 @@ class Elink:
             
         Returns:
             MediaInfo 
+        Raises:
+            FileNotFoundError: if indicated file path is not found
+            IOError: other file-related errors
         """
 
         # if posting a FILE, send that; if not, send just the PARAMETERS
         if file_path is not None:
-            if(file_path.startswith("http")):
-                res = requests.get(file_path)
-                filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
-
-                response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
-                            headers = { "Authorization" : f"Bearer {self.token}"},
-                            files={'file': (filename, res.content, mimetypes.guess_type(filename)[0])})
-            else:
-                response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
-                        headers = { "Authorization" : f"Bearer {self.token}"},
-                        files={ 'file': open(file_path, 'rb') })
+            response = self._get_session().post(f'{self.target}media/{osti_id}{query_params}',
+                    headers = { "Authorization" : f"Bearer {self.token}"},
+                    files={ 'file': open(file_path, 'rb') })
         else:
             raise ValueError("File path is missing.")
             
@@ -609,6 +599,9 @@ class Elink:
             
         Returns:
             MediaInfo 
+        Raises:
+            FileNotFoundError: if indicated file path is not found
+            IOError: other file-related errors
         """
         query_params = ""
         parameters = {}
@@ -647,6 +640,9 @@ class Elink:
             
         Returns:
             MediaInfo 
+        Raises:
+            FileNotFoundError: if indicated file path is not found
+            IOError: other file-related errors
         """
 
         # get the base filename or presume one
@@ -654,26 +650,14 @@ class Elink:
 
         # if posting a FILE, send that; if not, send just the PARAMETERS
         if file_path is not None:
-            if(file_path.startswith("http")):
-                response = requests.get(file_path, stream=True)
-                response.raw.decode_content = True
-                
-                mp_encoder = MultipartEncoder(
-                    fields={'file': (filename, response.content, mimetypes.guess_type(filename)[0])}
-                )   
-                response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
-                            headers = { "Authorization" : f"Bearer {self.token}", "Content-Type": mp_encoder.content_type},
-                            data=mp_encoder)
-                
-            else:
-                with open(file_path, 'rb') as f:
-                    m = MultipartEncoder(
-                            fields={'file': (filename, f, mimetypes.guess_type(filename)[0] )}
-                    )
+            with open(file_path, 'rb') as f:
+                m = MultipartEncoder(
+                        fields={'file': (filename, f, mimetypes.guess_type(filename)[0] )}
+                )
 
-                    response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
-                            headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
-                            data=m)
+                response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                        headers = { "Authorization" : f"Bearer {self.token}", 'Content-Type': m.content_type },
+                        data=m)
         else:
             raise ValueError("File path is missing.")
             
@@ -693,21 +677,16 @@ class Elink:
             
         Returns:
             MediaInfo 
+        Raises:
+            FileNotFoundError: if indicated file path is not found
+            IOError: other file-related errors
         """
 
         # if putting a FILE, send that; if not, send just the PARAMETERS
         if file_path is not None:
-            if(file_path.startswith("http")):
-                res = requests.get(file_path)
-                filename = os.path.basename(file_path) or str(osti_id) + ".pdf"
-
-                response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
-                            headers = { "Authorization" : f"Bearer {self.token}"},
-                            files={'file': (filename, res.content, mimetypes.guess_type(filename)[0]) })
-            else:
-                response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
-                        headers = { "Authorization" : f"Bearer {self.token}"},
-                        files={ 'file': open(file_path, 'rb') })
+            response = self._get_session().put(f'{self.target}media/{osti_id}/{media_id}{query_params}',
+                    headers = { "Authorization" : f"Bearer {self.token}"},
+                    files={ 'file': open(file_path, 'rb') })
         else:
             raise ValueError("File path is missing.")
             

@@ -158,3 +158,6 @@
 
 ## 0.5.5 - 11/4/2026
 - Adding SCL for Identifiers enumeration
+
+## 0.5.6 - 11/20/2026
+- Mitigate potential vulnerability in media POST/PUT endpoints
